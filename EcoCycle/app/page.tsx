@@ -65,6 +65,7 @@ const LoginPage = () => {
         localStorage.setItem('isAuthenticated', 'true');
         localStorage.setItem('userId', data.user?.id?.toString() || '');
         localStorage.setItem('token', data.token || '');
+        localStorage.setItem('userRole', data.user?.role || 'customer'); // Add this line
         
         // Check user role and redirect accordingly
         if (data.user?.role === 'admin') {
@@ -74,11 +75,6 @@ const LoginPage = () => {
           console.log("Customer user detected, redirecting to products");
           router.push('/products');
         }
-      } else {
-        setErrors(prev => ({
-          ...prev,
-          general: data.error || 'Invalid email or password',
-        }));
       }
     } catch (error) {
       console.error("Login Error:", error);

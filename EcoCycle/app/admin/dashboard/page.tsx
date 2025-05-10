@@ -5,6 +5,8 @@ import Head from 'next/head';
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { adminAPI } from '@/app/services/api';
+import RouteGuard from '@/components/RouteGuard';
 
 // Define types
 interface Product {
@@ -105,25 +107,35 @@ const AdminDashboardPage = () => {
   
   // Check if user is admin
   useEffect(() => {
-    // In a real app, you would validate admin status from a secure source
     const checkAdminStatus = async () => {
       try {
-        // Simulate API call to verify admin status
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        // Check if we're running on client-side
+        if (typeof window === 'undefined') {
+          return;
+        }
         
-        // For demo, assume logged in user is admin
-        // In production, you would check JWT token or session
+        // Check if user is authenticated
         const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
+        const token = localStorage.getItem('token');
         
-        if (!isAuthenticated) {
+        if (!isAuthenticated || !token) {
+          console.log("Not authenticated, redirecting to login");
           router.push('/account/login?required=true&returnUrl=/admin/dashboard');
           return;
         }
         
-        // Set admin status (in real app, would come from authentication token)
-        setIsAdmin(true);
+        // Check for admin role
+        const userRole = localStorage.getItem('userRole');
+        console.log("User role:", userRole);
         
-        // Load dashboard data
+        if (userRole !== 'admin') {
+          console.log("Not admin role, redirecting to products");
+          router.push('/products');
+          return;
+        }
+        
+        // User is admin, set state and load data
+        setIsAdmin(true);
         loadDashboardData();
       } catch (error) {
         console.error('Error checking admin status', error);
@@ -137,71 +149,29 @@ const AdminDashboardPage = () => {
   // Load dashboard data
   const loadDashboardData = async () => {
     try {
-      // Simulate API calls
-      await Promise.all([
-        // Load mock products
-        new Promise<void>(resolve => {
-          setTimeout(() => {
-            setProducts([
-              { id: 'P001', name: 'Eco-Friendly Water Bottle', price: 15.99, inventory: 145, category: 'Kitchen', status: 'active' },
-              { id: 'P002', name: 'Bamboo Utensil Set', price: 12.50, inventory: 78, category: 'Kitchen', status: 'active' },
-              { id: 'P003', name: 'Reusable Shopping Bag', price: 8.99, inventory: 243, category: 'Bags', status: 'active' },
-              { id: 'P004', name: 'Solar-Powered Charger', price: 34.99, inventory: 52, category: 'Electronics', status: 'active' },
-              { id: 'P005', name: 'Compostable Phone Case', price: 19.99, inventory: 18, category: 'Accessories', status: 'active' },
-              { id: 'P006', name: 'Recycled Notebook', price: 6.99, inventory: 112, category: 'Stationery', status: 'draft' },
-              { id: 'P007', name: 'Biodegradable Plant Pots', price: 9.99, inventory: 0, category: 'Garden', status: 'archived' }
-            ]);
-            resolve();
-          }, 300);
-        }),
-        
-        // Load mock orders
-        new Promise<void>(resolve => {
-          setTimeout(() => {
-            setOrders([
-              { id: 'ECO-12345678', date: 'May 1, 2025', customer: 'John Doe', total: 35.97, status: 'delivered' },
-              { id: 'ECO-87654321', date: 'Apr 30, 2025', customer: 'Jane Smith', total: 15.99, status: 'shipped' },
-              { id: 'ECO-11223344', date: 'Apr 29, 2025', customer: 'Alex Johnson', total: 67.45, status: 'processing' },
-              { id: 'ECO-55667788', date: 'Apr 28, 2025', customer: 'Sarah Williams', total: 29.99, status: 'processing' },
-              { id: 'ECO-99887766', date: 'Apr 27, 2025', customer: 'Robert Brown', total: 54.97, status: 'shipped' }
-            ]);
-            resolve();
-          }, 300);
-        }),
-        
-        // Load mock users
-        new Promise<void>(resolve => {
-          setTimeout(() => {
-            setUsers([
-              { id: 'U001', name: 'Admin User', email: 'admin@ecocycle.com', role: 'admin', lastLogin: 'Today, 9:45 AM' },
-              { id: 'U002', name: 'John Doe', email: 'john@example.com', role: 'customer', lastLogin: 'May 1, 2025' },
-              { id: 'U003', name: 'Jane Smith', email: 'jane@example.com', role: 'customer', lastLogin: 'Apr 30, 2025' },
-              { id: 'U004', name: 'Alex Johnson', email: 'alex@example.com', role: 'customer', lastLogin: 'Apr 29, 2025' },
-              { id: 'U005', name: 'Sarah Williams', email: 'sarah@example.com', role: 'customer', lastLogin: 'Apr 25, 2025' }
-            ]);
-            resolve();
-          }, 300);
-        }),
-        
-        // Load mock stats
-        new Promise<void>(resolve => {
-          setTimeout(() => {
-            setStats({
-              totalSales: 10542.97,
-              totalOrders: 143,
-              totalProducts: 24,
-              totalUsers: 87,
-              pendingOrders: 12,
-              lowStockProducts: 3
-            });
-            resolve();
-          }, 300);
-        })
+      setIsLoading(true);
+      
+      // Fetch real data from API
+      const [statsData, productsData, ordersData, usersData] = await Promise.all([
+        adminAPI.getStats(),
+        adminAPI.getProducts(),
+        adminAPI.getOrders(),
+        adminAPI.getUsers(),
       ]);
+      
+      // Update state with real data
+      setStats(statsData);
+      setProducts(productsData);
+      setOrders(ordersData);
+      setUsers(usersData);
       
       setIsLoading(false);
     } catch (error) {
       console.error('Error loading dashboard data', error);
+      setIsLoading(false);
+      
+      // Optionally show an error message to the user
+      alert('Failed to load dashboard data. Please try again.');
     }
   };
   
@@ -702,5 +672,14 @@ const AdminDashboardPage = () => {
     </>
   );
 };
+
+// // Wrap your component with RouteGuard
+// const ProtectedAdminDashboard = () => {
+//   return (
+//     <RouteGuard requiredRole="admin">
+//       <AdminDashboardPage />
+//     </RouteGuard>
+//   );
+// };
 
 export default AdminDashboardPage;

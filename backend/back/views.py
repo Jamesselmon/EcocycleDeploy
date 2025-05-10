@@ -13,8 +13,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 from .models import CartItem, Product, User, Payment, Order, ProductOrder 
-from django.db.models import Q
-
+from django.db.models import Q, Sum
 
 # API to retrieve current logged-in user
 @api_view(['GET'])
@@ -386,3 +385,99 @@ def get_user_orders(request):
         return Response({"orders": results}, status=200)
     except Exception as e:
         return Response({"error": str(e)}, status=500)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def admin_dashboard_stats(request):
+    # Check if user is admin
+    if not (request.user.is_staff or request.user.is_superuser):
+        return Response({"error": "Permission denied"}, status=status.HTTP_403_FORBIDDEN)
+    
+    # Get stats
+    total_products = Product.objects.count()
+    total_users = User.objects.count()
+    total_orders = Order.objects.count()
+    
+    # Calculate total sales
+    total_sales = Order.objects.aggregate(
+        total=Sum('total_price')  # Use Sum directly, not models.Sum
+    )['total'] or 0
+    
+    # Get pending orders count
+    pending_orders = Order.objects.filter(status='pending').count()
+    
+    # Get low stock products count
+    low_stock_products = Product.objects.filter(stock__lt=20).count()
+    
+    return Response({
+        'totalSales': float(total_sales),
+        'totalOrders': total_orders,
+        'totalProducts': total_products,
+        'totalUsers': total_users,
+        'pendingOrders': pending_orders,
+        'lowStockProducts': low_stock_products
+    })
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def admin_products_list(request):
+    # Check if user is admin
+    if not (request.user.is_staff or request.user.is_superuser):
+        return Response({"error": "Permission denied"}, status=status.HTTP_403_FORBIDDEN)
+    
+    products = Product.objects.all()
+    products_data = [
+        {
+            'id': product.id,
+            'name': product.name,
+            'price': float(product.price),
+            'inventory': product.stock,
+            'category': product.category,
+            'status': 'active',  # You may need to add a status field to your Product model
+            'description': product.description,
+            'image': request.build_absolute_uri(product.image.url) if product.image else None,
+        }
+        for product in products
+    ]
+    return Response(products_data)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def admin_orders_list(request):
+    # Check if user is admin
+    if not (request.user.is_staff or request.user.is_superuser):
+        return Response({"error": "Permission denied"}, status=status.HTTP_403_FORBIDDEN)
+    
+    orders = Order.objects.all().order_by('-order_date')
+    orders_data = [
+        {
+            'id': f'ECO-{order.id}',
+            'date': order.order_date.strftime('%b %d, %Y'),
+            'customer': order.shipping_name or order.customer.username,
+            'total': float(order.total_price),
+            'status': order.status,
+        }
+        for order in orders
+    ]
+    return Response(orders_data)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def admin_users_list(request):
+    # Check if user is admin
+    if not (request.user.is_staff or request.user.is_superuser):
+        return Response({"error": "Permission denied"}, status=status.HTTP_403_FORBIDDEN)
+    
+    users = User.objects.all()
+    users_data = [
+        {
+            'id': f'U{user.id:03d}',
+            'name': f'{user.first_name} {user.last_name}' if user.first_name or user.last_name else user.username,
+            'email': user.email,
+            'role': 'admin' if user.is_staff or user.is_superuser else 'customer',
+            'lastLogin': user.last_login.strftime('%b %d, %Y') if user.last_login else 'Never',
+        }
+        for user in users
+    ]
+    return Response(users_data)
