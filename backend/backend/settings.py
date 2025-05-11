@@ -62,6 +62,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'backend.wsgi.application'
 
+CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000", 
     "http://192.168.1.105:3000",
@@ -113,5 +114,8 @@ REST_FRAMEWORK = {
     ],
 }
 
-SESSION_COOKIE_SAMESITE = 'None'  
-SESSION_COOKIE_SECURE = False  
+# You might also need these for cookies to work properly
+SESSION_COOKIE_SAMESITE = 'None'
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SAMESITE = 'None'
+CSRF_COOKIE_SECURE = True
