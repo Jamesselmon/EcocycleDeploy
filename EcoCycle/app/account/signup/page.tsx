@@ -139,7 +139,7 @@ const SignupPage = () => {
       if (res.ok) {
         // User successfully registered
         alert('Registration successful! Please log in with your new account.');
-        router.push('/account/login?registered=true');
+        router.push('/');
       } else {
         setErrors(prev => ({ 
           ...prev, 

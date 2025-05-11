@@ -24,7 +24,7 @@ const Header = () => {
     const handleLogout = () => {
         localStorage.removeItem('userId');
         localStorage.removeItem('token');
-        router.push("/account/login");
+        router.push("/");
     };
 
     return (
