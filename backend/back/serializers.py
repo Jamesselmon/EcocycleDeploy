@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import User, Product, CartItem, Order, ProductOrder
 
+<<<<<<< HEAD
 # Serializer สำหรับแสดงข้อมูลผู้ใช้
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -20,6 +21,21 @@ class ProductSerializer(serializers.ModelSerializer):
 # Serializer สำหรับรายการสินค้าในแต่ละออเดอร์
 class ProductOrderSerializer(serializers.ModelSerializer):
     # ดึงชื่อสินค้าจาก ForeignKey product
+=======
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'fullname', 'email', 'role', 'address', 'tel']
+
+
+class ProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ['id', 'name', 'description', 'price', 'stock', 'category', 'image']
+
+
+class ProductOrderSerializer(serializers.ModelSerializer):
+>>>>>>> origin/main
     product_name = serializers.CharField(source='product.name')
 
     class Meta:
@@ -27,16 +43,22 @@ class ProductOrderSerializer(serializers.ModelSerializer):
         fields = ['product_name', 'quantity', 'total_price']
 
 
+<<<<<<< HEAD
 # Serializer สำหรับคำสั่งซื้อ (Order)
 # รวมสินค้าในออเดอร์ด้วยฟิลด์เสริม 'items'
 class OrderSerializer(serializers.ModelSerializer):
     items = serializers.SerializerMethodField()  # ใช้เมธอด get_items ดึงข้อมูลสินค้าในออเดอร์
+=======
+class OrderSerializer(serializers.ModelSerializer):
+    items = serializers.SerializerMethodField()
+>>>>>>> origin/main
 
     class Meta:
         model = Order
         fields = ['id', 'order_date', 'status', 'total_price', 'items']
 
     def get_items(self, obj):
+<<<<<<< HEAD
         # ดึง ProductOrder ทั้งหมดที่เชื่อมกับออเดอร์นี้
         product_orders = ProductOrder.objects.filter(order=obj)
         # แปลงเป็น list ด้วย serializer
@@ -51,6 +73,18 @@ class CartItemSerializer(serializers.ModelSerializer):
     price = serializers.DecimalField(source='product.price', max_digits=10, decimal_places=2)  # ราคาสินค้า
     available = serializers.IntegerField(source='product.stock')  # จำนวนคงเหลือ
     imageUrl = serializers.ImageField(source='product.image')  # รูปภาพสินค้า
+=======
+        product_orders = ProductOrder.objects.filter(order=obj)
+        return ProductOrderSerializer(product_orders, many=True).data
+
+
+class CartItemSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(source='product.name')
+    description = serializers.CharField(source='product.description')
+    price = serializers.DecimalField(source='product.price', max_digits=10, decimal_places=2)
+    available = serializers.IntegerField(source='product.stock')
+    imageUrl = serializers.ImageField(source='product.image')
+>>>>>>> origin/main
 
     class Meta:
         model = CartItem

@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User  
+<<<<<<< HEAD
 
 # ProductManager: ฟังก์ชันเสริม flexible_lookup() ใช้ค้นหาสินค้าจาก id หรือ name แบบยืดหยุ่น
 class ProductManager(models.Manager):
@@ -20,6 +21,41 @@ class ProductManager(models.Manager):
 class Product(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True) 
+=======
+from django.utils import timezone
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
+from django.contrib.auth.models import User
+
+class ProductManager(models.Manager):
+    def flexible_lookup(self, product_id=None, name=None):
+        if product_id:
+            # ลองค้นหาด้วย ID หลัก
+            try:
+                return self.get(id=product_id)
+            except self.model.DoesNotExist:
+                # ถ้าไม่พบ ให้ค้นหาด้วยชื่อสินค้า
+                if name:
+                    # ค้นหาโดยใช้ icontains (ค้นหาแบบไม่สนใจตัวพิมพ์เล็ก/ใหญ่และค้นหาแบบบางส่วน)
+                    return self.filter(name__icontains=name).first()
+                
+                # ถ้าไม่มีชื่อ สามารถค้นหาด้วยวิธีอื่นได้ เช่น slug, sku ฯลฯ
+                # คุณสามารถเพิ่มตรงนี้ได้...
+                
+                # หากไม่พบด้วยวิธีอื่น ให้คืนค่า None
+                return None
+        elif name:
+            # ถ้ามีแค่ชื่อ ค้นหาด้วยชื่อ
+            return self.filter(name__icontains=name).first()
+            
+        # ถ้าไม่มีทั้ง ID และชื่อ ให้คืนค่า None
+        return None
+
+class Product(models.Model):
+    name = models.CharField(max_length=255)
+    description = models.TextField(blank=True, null=True)  # เพิ่มฟิลด์ description
+>>>>>>> origin/main
     price = models.DecimalField(max_digits=10, decimal_places=2)
     stock = models.IntegerField()
     category = models.CharField(max_length=255)
@@ -28,8 +64,11 @@ class Product(models.Model):
     def __str__(self):
         return self.name
 
+<<<<<<< HEAD
 # Payment: เก็บข้อมูลการชำระเงิน เช่น วิธีบัตร ชื่อผู้ถือบัตร วันหมดอายุ
 # เชื่อมโยงกับ User ที่เป็นเจ้าของการชำระเงิน
+=======
+>>>>>>> origin/main
 class Payment(models.Model):
     method = models.CharField(max_length=255)
     card_no = models.CharField(max_length=20, blank=True)
@@ -41,8 +80,11 @@ class Payment(models.Model):
     def __str__(self):
         return f"{self.method} - {self.holder_name}"
 
+<<<<<<< HEAD
 # Order: เก็บคำสั่งซื้อของผู้ใช้
 # มีข้อมูลรวมราคาทั้งหมด การจ่ายเงิน สถานะ วันที่ และที่อยู่จัดส่ง
+=======
+>>>>>>> origin/main
 class Order(models.Model):
     customer = models.ForeignKey(User, on_delete=models.CASCADE)
     total_price = models.FloatField()
@@ -59,8 +101,11 @@ class Order(models.Model):
     def __str__(self):
         return f"Order #{self.id} - {self.customer}"
 
+<<<<<<< HEAD
 # ProductOrder: เชื่อมโยงระหว่างสินค้าและคำสั่งซื้อ (Many-to-Many with extra fields)
 # มีระบบตัด stock ทันทีตอนสั่งซื้อ ถ้า stock ไม่พอจะ raise error
+=======
+>>>>>>> origin/main
 class ProductOrder(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
@@ -71,15 +116,24 @@ class ProductOrder(models.Model):
         return f"{self.product.name} x {self.quantity}"
 
     def save(self, *args, **kwargs):
+<<<<<<< HEAD
         if not self.pk:  #เป็นการสร้างใหม่ ไม่ใช่อัปเดต
+=======
+        # ตัด stock ตอนสร้าง (เฉพาะตอนสร้างใหม่เท่านั้น)
+        if not self.pk:  # แปลว่าเป็นการสร้างใหม่ ไม่ใช่อัปเดต
+>>>>>>> origin/main
             if self.product.stock < self.quantity:
                 raise ValueError(f"Not enough stock for {self.product.name}")
             self.product.stock -= self.quantity
             self.product.save()
         super().save(*args, **kwargs)
+<<<<<<< HEAD
         
 # CartItem: เก็บรายการที่ผู้ใช้เพิ่มลงตะกร้า
 # มี method total_price() เพื่อคำนวณราคาของ item นั้นๆ
+=======
+
+>>>>>>> origin/main
 class CartItem(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)

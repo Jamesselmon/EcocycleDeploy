@@ -55,7 +55,11 @@ const OrderDetailsPage = () => {
     const fetchOrderDetails = async () => {
       if (!orderId) return;
 
+<<<<<<< HEAD
       const userToken = localStorage.getItem('token'); 
+=======
+      const userToken = localStorage.getItem('token'); // ✅ ดึง token
+>>>>>>> origin/main
       if (!userToken) {
         console.warn("User token not found.");
         return;
@@ -66,7 +70,11 @@ const OrderDetailsPage = () => {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
+<<<<<<< HEAD
             'Authorization': `Token ${userToken}`, 
+=======
+            'Authorization': `Token ${userToken}`, // ✅ ใส่ token
+>>>>>>> origin/main
           },
         });
 
@@ -77,7 +85,11 @@ const OrderDetailsPage = () => {
         const mappedData: OrderDetails = {
           id: data.orderId,
           date: data.orderDate,
+<<<<<<< HEAD
           status: data.status, 
+=======
+          status: data.status, // หรือเปลี่ยนเป็น data.status ถ้ามี
+>>>>>>> origin/main
           items: data.items.map((item: any) => ({
             id: item.id,
             name: item.name,
@@ -101,7 +113,11 @@ const OrderDetailsPage = () => {
           shippingCost: data.shippingCost,
           tax: data.tax,
           total: data.total,
+<<<<<<< HEAD
           trackingNumber: '', 
+=======
+          trackingNumber: '', // ใส่ถ้ามีใน API
+>>>>>>> origin/main
           estimatedDelivery: data.estimatedDelivery,
         };
 
@@ -133,7 +149,11 @@ const OrderDetailsPage = () => {
   };
 
   const formatCurrency = (amount: number) => {
+<<<<<<< HEAD
     return `${amount.toFixed(2)} ฿` ;
+=======
+    return `$${amount.toFixed(2)}`;
+>>>>>>> origin/main
   };
 
 
@@ -170,7 +190,11 @@ const OrderDetailsPage = () => {
                     <div className="p-6 bg-emerald-50 border-b border-emerald-100">
                       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center">
                         <div>
+<<<<<<< HEAD
                           <h1 className="text-2xl font-bold text-gray-800 mb-1">Order ECO-{orderDetails.id}</h1>
+=======
+                          <h1 className="text-2xl font-bold text-gray-800 mb-1">Order #{orderDetails.id}</h1>
+>>>>>>> origin/main
                           <p className="text-sm text-gray-600">Placed on {orderDetails.date}</p>
                         </div>
                         <div className="mt-4 sm:mt-0">
