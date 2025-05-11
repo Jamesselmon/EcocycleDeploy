@@ -87,27 +87,58 @@ const SignupPage = () => {
   
     setIsLoading(true);
     try {
-      const res = await fetch('http://localhost:8000/register/', {
+      // Use environment variable for API URL
+      const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      
+      console.log("Sending registration request to:", apiBaseUrl + '/register/');
+      console.log("Request data:", {
+        username: formData.email,
+        password: formData.password,
+        first_name: formData.firstName,
+        last_name: formData.lastName
+      });
+      
+      const res = await fetch(`${apiBaseUrl}/register/`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          // Add CORS headers if needed
+          'Accept': 'application/json'
+        },
         body: JSON.stringify({
           username: formData.email,
           password: formData.password,
           first_name: formData.firstName,
           last_name: formData.lastName
         }),
-        
+        // Enable credentials if your API requires cookies
+        credentials: 'include'
       });
   
-      const data = await res.json();
+      console.log("Registration response status:", res.status);
+      
+      // Try to parse the response
+      let data;
+      try {
+        data = await res.json();
+        console.log("Registration response data:", data);
+      } catch (err) {
+        console.error("Error parsing response:", err);
+        data = { error: "Could not parse server response" };
+      }
+      
       if (res.ok) {
         // User successfully registered
         alert('Registration successful! Please log in with your new account.');
-        router.push('/account/login');
+        router.push('/account/login?registered=true');
       } else {
-        setErrors(prev => ({ ...prev, general: data.error || 'Registration failed' }));
+        setErrors(prev => ({ 
+          ...prev, 
+          general: data.error || data.message || data.detail || 'Registration failed. Please try again.' 
+        }));
       }
     } catch (error) {
+      console.error("Registration request error:", error);
       setErrors(prev => ({ ...prev, general: 'Server error. Please try again.' }));
     } finally {
       setIsLoading(false);
