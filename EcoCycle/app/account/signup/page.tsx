@@ -3,6 +3,11 @@ import Head from 'next/head';
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
+// At the top of your file, add this debugging code
+console.log("NEXT_PUBLIC_API_URL:", process.env.NEXT_PUBLIC_API_URL);
+console.log("Environment:", process.env.NODE_ENV);
+
+
 const SignupPage = () => {
   const router = useRouter();
 
@@ -38,7 +43,11 @@ const SignupPage = () => {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({ firstName: '', lastName: '', email: '', password: '', confirmPassword: '', general: '' });
-  
+    
+    // test debug effing deploy
+    const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+    console.log("Using API URL:", apiBaseUrl);
+
     let isValid = true;
     const newErrors = { ...errors };
   
