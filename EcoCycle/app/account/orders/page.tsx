@@ -88,11 +88,7 @@ const OrdersPage = () => {
   
   // Function to format currency
   const formatCurrency = (amount: number) => {
-<<<<<<< HEAD
     return `${amount.toFixed(2)} ฿`;
-=======
-    return `$${amount.toFixed(2)}`;
->>>>>>> origin/main
   };
   
   // View order details
@@ -163,11 +159,7 @@ const OrdersPage = () => {
                           className="hover:bg-gray-50 transition-colors duration-150"
                         >
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-<<<<<<< HEAD
                             ECO - {order.id}
-=======
-                            {order.id}
->>>>>>> origin/main
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                             {order.date}

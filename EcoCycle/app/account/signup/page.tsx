@@ -1,10 +1,6 @@
 "use client";
 import Head from 'next/head';
 import React, { useState } from 'react';
-<<<<<<< HEAD
-=======
-import Link from 'next/link';
->>>>>>> origin/main
 import { useRouter } from 'next/navigation';
 
 const SignupPage = () => {

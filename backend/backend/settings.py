@@ -1,6 +1,5 @@
 from pathlib import Path
 import os
-<<<<<<< HEAD
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -9,12 +8,6 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get('SECRET_KEY')
-=======
-
-BASE_DIR = Path(__file__).resolve().parent.parent
-
-SECRET_KEY = 'django-insecure-$9ip^594p%vk5t)k^m+7!e@cwl*fxnyjt&y#zj9*w+x4h2=qef'
->>>>>>> origin/main
 
 DEBUG = True
 
@@ -24,12 +17,6 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
-<<<<<<< HEAD
-=======
-
-
-
->>>>>>> origin/main
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -80,7 +67,6 @@ CORS_ALLOWED_ORIGINS = [
     "http://192.168.1.105:3000",
 ]
 
-<<<<<<< HEAD
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -92,26 +78,6 @@ DATABASES = {
     }
 }
 
-=======
-
-# Database
-# https://docs.djangoproject.com/en/5.1/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'mydb',
-        'USER': 'postgres',
-        'PASSWORD': '1234',
-        'HOST': 'localhost',
-        'PORT': '5432',
-    }
-}
-
-# Password validation
-# https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
-
->>>>>>> origin/main
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -128,12 +94,6 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-<<<<<<< HEAD
-=======
-# Internationalization
-# https://docs.djangoproject.com/en/5.1/topics/i18n/
-
->>>>>>> origin/main
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
@@ -142,20 +102,8 @@ USE_I18N = True
 
 USE_TZ = True
 
-<<<<<<< HEAD
 STATIC_URL = 'static/'
 
-=======
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.1/howto/static-files/
-
-STATIC_URL = 'static/'
-
-# Default primary key field type
-# https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
-
->>>>>>> origin/main
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
@@ -164,9 +112,5 @@ REST_FRAMEWORK = {
     ],
 }
 
-<<<<<<< HEAD
 SESSION_COOKIE_SAMESITE = 'None'  
-=======
-SESSION_COOKIE_SAMESITE = 'None'  # ⭐️ เพื่อให้ browser ยอมรับ session ระหว่าง origin ต่างกัน
->>>>>>> origin/main
 SESSION_COOKIE_SECURE = False  

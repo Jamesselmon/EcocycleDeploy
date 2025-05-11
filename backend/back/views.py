@@ -4,62 +4,37 @@ from .models import Product, User ,CartItem
 from .serializers import UserSerializer, ProductSerializer
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
-<<<<<<< HEAD
 from django.contrib.auth.models import User
 from rest_framework import status
 import json
-=======
-from django.contrib.auth import authenticate
-from django.contrib.auth.models import User
-from rest_framework import status
-import json
-from django.contrib.auth.hashers import make_password
->>>>>>> origin/main
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 from .models import CartItem, Product, User, Payment, Order, ProductOrder 
 from django.db.models import Q, Sum
 
-<<<<<<< HEAD
 #ดึงข้อมูลผู้ใช้งานที่ล็อกอินอยู่
-=======
-# API to retrieve current logged-in user
->>>>>>> origin/main
 @api_view(['GET'])
 def get_current_user(request):
     serializer = UserSerializer(request.user)
     return Response(serializer.data)
 
-<<<<<<< HEAD
 #ล็อกอินผู้ใช้ด้วย username หรือ email → ส่ง token และ role กลับ
 @api_view(['POST'])
 def login_view(request):
     try:
         input_id = request.data.get('username')  
-=======
-
-@api_view(['POST'])
-def login_view(request):
-    try:
-        input_id = request.data.get('username')  # อาจเป็น username หรือ email
->>>>>>> origin/main
         password = request.data.get('password')
 
         if not input_id or not password:
             return Response({"error": "Username/email and password are required"}, status=status.HTTP_400_BAD_REQUEST)
 
-<<<<<<< HEAD
         #ค้นหา user โดย username หรือ email
-=======
-        # 🔍 ค้นหา user โดย username หรือ email
->>>>>>> origin/main
         try:
             user = User.objects.get(Q(username=input_id) | Q(email=input_id))
         except User.DoesNotExist:
             return Response({"error": "Invalid credentials"}, status=status.HTTP_400_BAD_REQUEST)
 
-<<<<<<< HEAD
         #ตรวจสอบ password
         if not user.check_password(password):
             return Response({"error": "Invalid credentials"}, status=status.HTTP_400_BAD_REQUEST)
@@ -68,25 +43,11 @@ def login_view(request):
         token, created = Token.objects.get_or_create(user=user)
 
 
-=======
-        # ✅ ตรวจสอบ password
-        if not user.check_password(password):
-            return Response({"error": "Invalid credentials"}, status=status.HTTP_400_BAD_REQUEST)
-
-        # ✅ login สำเร็จ → ส่ง token
-        token, created = Token.objects.get_or_create(user=user)
-
-        # Explicitly determine user role - Debug info added
->>>>>>> origin/main
         is_staff = user.is_staff
         is_superuser = user.is_superuser
         print(f"User {user.username} - is_staff: {is_staff}, is_superuser: {is_superuser}")
         
-<<<<<<< HEAD
 
-=======
-        # Set role based on staff status
->>>>>>> origin/main
         user_role = 'admin' if (is_staff or is_superuser) else 'customer'
         print(f"Assigned role: {user_role}")
 
@@ -114,11 +75,7 @@ def login_view(request):
 
 
 
-<<<<<<< HEAD
 #ดึงรายการสินค้า
-=======
-# API to retrieve product list
->>>>>>> origin/main
 @api_view(['GET'])
 def product_list(request):
     products = Product.objects.all()
@@ -134,11 +91,7 @@ def product_list(request):
     ]
     return Response(products_data)
 
-<<<<<<< HEAD
 #ดึงรายละเอียดสินค้าตาม id
-=======
-
->>>>>>> origin/main
 @api_view(['GET'])
 def product_detail(request, id):
     try:
@@ -149,11 +102,7 @@ def product_detail(request, id):
     serializer = ProductSerializer(product)
     return Response(serializer.data)
 
-<<<<<<< HEAD
 #ลงทะเบียนผู้ใช้ใหม่จาก JSON ที่รับมาด้วย POST
-=======
-
->>>>>>> origin/main
 @csrf_exempt
 def register_view(request):
     if request.method == 'POST':
@@ -185,11 +134,7 @@ def register_view(request):
 
     return JsonResponse({'error': 'Invalid request method'}, status=405)
 
-<<<<<<< HEAD
 #เพิ่มสินค้าไปยังตะกร้า ตรวจ stock และรวมจำนวนเดิม
-=======
-
->>>>>>> origin/main
 @csrf_exempt
 def add_to_cart(request):
     if request.method == 'POST':
@@ -241,11 +186,7 @@ def add_to_cart(request):
 
     return JsonResponse({'error': 'Invalid method'}, status=405)
 
-<<<<<<< HEAD
 #ดึงรายการสินค้าในตะกร้าของผู้ใช้ตาม user_id
-=======
-
->>>>>>> origin/main
 @api_view(['GET'])
 def get_cart_items(request, user_id):
     try:
@@ -269,11 +210,7 @@ def get_cart_items(request, user_id):
         return Response({"error": "User not found"}, status=404)
 
 
-<<<<<<< HEAD
 #ทำการ checkout → สร้าง Payment + Order + ProductOrder และล้างตะกร้า
-=======
-
->>>>>>> origin/main
 @api_view(['POST'])
 def checkout(request):
     try:
@@ -337,11 +274,7 @@ def checkout(request):
 
 
     
-<<<<<<< HEAD
 #ค้นหาสินค้าด้วย id หรือชื่อ (ใช้ flexible_lookup)
-=======
-
->>>>>>> origin/main
 @api_view(['GET'])
 def product_lookup(request):
     search_id = request.query_params.get('id')
@@ -372,10 +305,7 @@ def product_lookup(request):
         }
     }, status=status.HTTP_200_OK)
 
-<<<<<<< HEAD
 #ดึงข้อมูลสรุปของออเดอร์ตาม order_id → สำหรับหน้ายืนยันคำสั่งซื้อ
-=======
->>>>>>> origin/main
 @api_view(['GET'])
 def get_order_confirmation(request, order_id):
     try:
@@ -421,11 +351,7 @@ def get_order_confirmation(request, order_id):
     except Order.DoesNotExist:
         return Response({"error": "Order not found"}, status=404)
 
-<<<<<<< HEAD
 #ลบสินค้าออกจากตะกร้าตาม user_id และ item_id
-=======
-
->>>>>>> origin/main
 @api_view(['DELETE'])
 def remove_cart_item(request, user_id, item_id):
     try:
@@ -435,11 +361,7 @@ def remove_cart_item(request, user_id, item_id):
     except CartItem.DoesNotExist:
         return Response({'error': 'Item not found'}, status=404)
 
-<<<<<<< HEAD
 #ดึงรายการออเดอร์ทั้งหมดของผู้ใช้ที่ล็อกอินอยู่
-=======
-
->>>>>>> origin/main
 @api_view(['GET'])
 def get_user_orders(request):
     try:
@@ -463,11 +385,7 @@ def get_user_orders(request):
     except Exception as e:
         return Response({"error": str(e)}, status=500)
 
-<<<<<<< HEAD
 #ดึงสถิติเชิงภาพรวมของระบบ (ใช้ในแอดมินแดชบอร์ด) เช่น total sales, users, orders
-=======
-
->>>>>>> origin/main
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def admin_dashboard_stats(request):
@@ -500,10 +418,7 @@ def admin_dashboard_stats(request):
         'lowStockProducts': low_stock_products
     })
 
-<<<<<<< HEAD
 #ดึงรายการสินค้าแบบละเอียด (เฉพาะ admin)
-=======
->>>>>>> origin/main
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def admin_products_list(request):
@@ -527,10 +442,7 @@ def admin_products_list(request):
     ]
     return Response(products_data)
 
-<<<<<<< HEAD
 #ดึงรายการคำสั่งซื้อทั้งหมด (เฉพาะ admin)
-=======
->>>>>>> origin/main
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def admin_orders_list(request):
@@ -551,10 +463,7 @@ def admin_orders_list(request):
     ]
     return Response(orders_data)
 
-<<<<<<< HEAD
 #ดึงรายการผู้ใช้งานทั้งหมด (เฉพาะ admin)
-=======
->>>>>>> origin/main
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def admin_users_list(request):
