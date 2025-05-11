@@ -6,7 +6,6 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { adminAPI } from '@/app/services/api';
-import RouteGuard from '@/components/RouteGuard';
 
 // Define types
 interface Product {
