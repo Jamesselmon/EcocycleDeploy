@@ -10,11 +10,12 @@ RUN npm install
 COPY EcoCycle/ .
 
 # Set environment variables
-ENV NEXT_TELEMETRY_DISABLED=1
+ENV PORT=3000
 ENV HOST=0.0.0.0
+ENV NEXT_TELEMETRY_DISABLED=1
 
 # Expose the port
 EXPOSE 3000
 
-# Run in development mode
-CMD ["npm", "run", "dev", "--", "-H", "0.0.0.0"]
+# Run in development mode with explicit host and port
+CMD ["npm", "run", "dev", "--", "-p", "3000", "-H", "0.0.0.0"]
