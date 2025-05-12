@@ -19,21 +19,12 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 // Updated ProductCard component with debugging
 const ProductCard = ({ id, name, price, image, category }: Product) => {
     const router = useRouter();
-    const [imageSrc, setImageSrc] = useState<string>('/images/placeholder.svg');
-    const [imageError, setImageError] = useState<boolean>(false);
     
-    useEffect(() => {
-        if (image) {
-            console.log(`Product ${id}: Setting image to ${image}`);
-            setImageSrc(image);
-        }
-    }, [id, image]);
+    // Since images are in the public directory, use the path directly or fallback to placeholder
+    const imagePath = image || '/images/placeholder.svg';
     
-    const handleImageError = () => {
-        console.error(`Failed to load image: ${imageSrc}`);
-        setImageSrc('/images/placeholder.svg');
-        setImageError(true);
-    };
+    // Log for debugging
+    console.log(`Product ${id} - ${name}: Using image path: ${imagePath}`);
 
     return (
         <div
@@ -41,27 +32,20 @@ const ProductCard = ({ id, name, price, image, category }: Product) => {
             onClick={() => router.push(`/products/${id}`)}
         >
             <div className="h-48 flex justify-center items-center border-b mb-4 overflow-hidden">
-                {/* Use standard img tag for better compatibility */}
-                <img
-                    src={imageSrc}
+                {/* Use Next.js Image component since images are local */}
+                <img 
+                    src={imagePath}
                     alt={name || 'Product Image'}
                     className="object-cover h-full w-full"
-                    onError={handleImageError}
+                    onError={(e) => {
+                        console.error(`Failed to load image: ${imagePath}`);
+                        e.currentTarget.src = '/images/placeholder.svg';
+                    }}
                 />
-                
-                {/* Show error message if image failed to load */}
-                {imageError && (
-                    <div className="absolute bottom-0 w-full bg-red-500 text-white text-xs p-1 text-center">
-                        Image not found
-                    </div>
-                )}
             </div>
             <h2 className="text-lg font-semibold text-emerald-700">{name}</h2>
             <p className="text-emerald-700 font-bold">฿{`${parseFloat(price.toString()).toFixed(2)}`}</p>
             <p className="text-sm text-gray-600">Category: {category}</p>
-            
-            {/* Debug info - remove in production */}
-            <p className="text-xs text-gray-400 mt-2">Image: {image || 'none'}</p>
         </div>
     );
 };
