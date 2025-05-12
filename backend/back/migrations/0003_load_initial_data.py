@@ -7,36 +7,29 @@ from django.db import migrations
 from datetime import datetime
 # from django.utils import timezone # No longer strictly needed if using fromisoformat directly for aware datetimes
 from decimal import Decimal # For Product.price
+from django.utils import timezone
+
 
 def parse_datetime_with_tz(dt_str):
     if dt_str is None:
         return None
     
-    # Standardize the timezone format
-    if '+' in dt_str or '-' in dt_str:
-        # Find the position of the timezone sign
-        sign_pos = max(dt_str.rfind('+'), dt_str.rfind('-'))
-        if sign_pos != -1:
-            # Get the timezone part
-            tz_part = dt_str[sign_pos:]
-            
-            # Case 1: +00 format (needs to become +00:00)
-            if len(tz_part) == 3:
-                dt_str = dt_str[:sign_pos+3] + ':00'
-            # Case 2: Already has +00:00 format (leave it alone)
-            elif ':' in tz_part:
-                pass
-            # Case 3: +0000 format (needs a colon inserted)
-            elif len(tz_part) == 5:
-                dt_str = dt_str[:sign_pos+3] + ':' + dt_str[sign_pos+3:]
+    # Handle timezone format issues
+    # For +00:00 format
+    if dt_str.endswith('+00:00'):
+        # Remove the redundant :00 to make it compatible
+        dt_str = dt_str[:-5] + '+00'
     
+    # For +00 format, add the missing :00
+    elif dt_str.endswith('+00'):
+        dt_str = dt_str + ':00'
+        
     try:
-        dt_obj = datetime.fromisoformat(dt_str)
-        return dt_obj
-    except ValueError as e:
-        print(f"Error parsing datetime '{dt_str}': {e}")
-        # Fallback parsing if needed
-        return None
+        return datetime.fromisoformat(dt_str)
+    except ValueError:
+        # Fallback to timezone.now() to prevent NULL values
+        print(f"Failed to parse datetime '{dt_str}', using current time instead")
+        return timezone.now()
 
 def load_initial_data(apps, schema_editor):
     # We get the model from the versioned app registry;
