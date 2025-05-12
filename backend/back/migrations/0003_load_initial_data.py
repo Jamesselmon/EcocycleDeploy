@@ -84,8 +84,8 @@ def load_initial_data(apps, schema_editor):
         user_id_for_token = token_data.pop('user_id') # Renamed to avoid conflict
         user_instance = created_users.get(user_id_for_token)
         if user_instance:
-            Token.objects.create(user=user_instance, **token_data)
-
+            Token.objects.update_or_create(user=user_instance, defaults=token_data)
+            
     # --- Load Payments ---
     payments_data = [
         {'id': 2, 'method': 'paypal', 'card_no': '', 'expired': '', 'holder_name': '', 'payment_date': parse_datetime_with_tz('2025-05-10 06:41:22.455547+00'), 'payment_owner_id': 3},
