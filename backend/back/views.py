@@ -79,25 +79,44 @@ def login_view(request):
 # Product list view for local images in Next.js public directory
 @api_view(['GET'])
 def product_list(request):
-    products = Product.objects.all()
-    products_data = [
-        {
-            'id': product.id,
-            'name': product.name,
-            'category': product.category,
-            'price': str(product.price),
-            # Just pass the image path as is - it will be used directly in the frontend
-            'image': product.image,
-        }
-        for product in products
-    ]
+    try:
+        products = Product.objects.all()
+        
+        products_data = []
+        for product in products:
+            # Debug info
+            print(f"Processing product: ID={product.id}, Name={product.name}")
+            
+            # Check if image exists
+            image_path = None
+            if product.image:
+                try:
+                    # Check if the image field has a value
+                    image_path = product.image.url
+                    print(f"Image path: {image_path}")
+                except Exception as img_err:
+                    print(f"Error getting image URL: {str(img_err)}")
+            
+            # Create product data with proper error handling
+            product_data = {
+                'id': product.id,
+                'name': product.name,
+                'category': product.category,
+                'price': str(product.price),
+                'image': image_path,
+            }
+            products_data.append(product_data)
+        
+        print(f"Returning {len(products_data)} products")
+        return Response(products_data)
     
-    # Debug information
-    for product in products_data:
-        print(f"Product ID: {product['id']}, Name: {product['name']}")
-        print(f"Image path: {product['image']}")
-    
-    return Response(products_data)
+    except Exception as e:
+        # Log the error
+        print(f"Error in product_list view: {str(e)}")
+        return Response(
+            {"error": f"Failed to load products: {str(e)}"},
+            status=500
+        )
 
 
 #ดึงรายละเอียดสินค้าตาม id

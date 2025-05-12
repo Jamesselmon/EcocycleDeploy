@@ -16,16 +16,24 @@ type Product = {
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
-// Updated ProductCard for local images in public directory
+// Updated ProductCard component with debugging
 const ProductCard = ({ id, name, price, image, category }: Product) => {
     const router = useRouter();
+    const [imageSrc, setImageSrc] = useState<string>('/images/placeholder.svg');
+    const [imageError, setImageError] = useState<boolean>(false);
     
-    // Use the image path directly or fallback to placeholder
-    // No need to prepend API_BASE_URL since images are in the public directory
-    const imagePath = image || '/images/placeholder.svg';
+    useEffect(() => {
+        if (image) {
+            console.log(`Product ${id}: Setting image to ${image}`);
+            setImageSrc(image);
+        }
+    }, [id, image]);
     
-    // Log for debugging
-    console.log(`Product ${id} - ${name}: Using image path: ${imagePath}`);
+    const handleImageError = () => {
+        console.error(`Failed to load image: ${imageSrc}`);
+        setImageSrc('/images/placeholder.svg');
+        setImageError(true);
+    };
 
     return (
         <div
@@ -33,21 +41,27 @@ const ProductCard = ({ id, name, price, image, category }: Product) => {
             onClick={() => router.push(`/products/${id}`)}
         >
             <div className="h-48 flex justify-center items-center border-b mb-4 overflow-hidden">
-                {/* Now we can use Next.js Image component since images are local */}
-                <Image 
-                    src={imagePath}
+                {/* Use standard img tag for better compatibility */}
+                <img
+                    src={imageSrc}
                     alt={name || 'Product Image'}
-                    width={500}
-                    height={300}
                     className="object-cover h-full w-full"
-                    onError={() => {
-                        console.error(`Failed to load image: ${imagePath}`);
-                    }}
+                    onError={handleImageError}
                 />
+                
+                {/* Show error message if image failed to load */}
+                {imageError && (
+                    <div className="absolute bottom-0 w-full bg-red-500 text-white text-xs p-1 text-center">
+                        Image not found
+                    </div>
+                )}
             </div>
             <h2 className="text-lg font-semibold text-emerald-700">{name}</h2>
             <p className="text-emerald-700 font-bold">฿{`${parseFloat(price.toString()).toFixed(2)}`}</p>
             <p className="text-sm text-gray-600">Category: {category}</p>
+            
+            {/* Debug info - remove in production */}
+            <p className="text-xs text-gray-400 mt-2">Image: {image || 'none'}</p>
         </div>
     );
 };
@@ -65,6 +79,7 @@ const ProductPage = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [apiResponse, setApiResponse] = useState<any>(null);
 
     useEffect(() => {
         if (!API_BASE_URL) {
@@ -85,6 +100,9 @@ const ProductPage = () => {
                 return res.json();
             })
             .then(data => {
+                // Store raw API response for debugging
+                setApiResponse(data);
+                
                 if (!Array.isArray(data)) {
                     console.error('API did not return an array:', data);
                     throw new Error('Invalid data format received from API.');
@@ -94,7 +112,7 @@ const ProductPage = () => {
                 console.log("Products received from API:", data.length);
                 data.forEach((product, index) => {
                     console.log(`Product ${index+1}: ID=${product.id}, Name=${product.name}`);
-                    console.log(`  Image path: ${product.image}`);
+                    console.log(`  Image: ${product.image}`);
                 });
                 
                 setProducts(data);
@@ -128,7 +146,18 @@ const ProductPage = () => {
         <div className="flex flex-col min-h-screen bg-gray-100 font-[Playfair Display]">
             <Header />
             <main className="flex-grow flex items-center justify-center">
-                <p className="text-red-600">Error: {error}</p>
+                <div className="p-4 bg-white rounded-lg shadow-md">
+                    <p className="text-red-600 mb-4">Error: {error}</p>
+                    
+                    {/* Debug info */}
+                    <div className="mt-4 p-3 bg-gray-100 rounded text-xs overflow-auto">
+                        <p className="font-bold">API URL:</p>
+                        <p>{API_BASE_URL}/products/</p>
+                        
+                        <p className="font-bold mt-2">API Response:</p>
+                        <pre>{JSON.stringify(apiResponse, null, 2)}</pre>
+                    </div>
+                </div>
             </main>
             <Footer />
         </div>
@@ -162,6 +191,13 @@ const ProductPage = () => {
                             >
                                 Search
                             </button>
+                        </div>
+
+                        {/* Debug info */}
+                        <div className="mb-4 p-3 bg-gray-100 rounded">
+                            <p className="text-sm font-bold">API Response Summary:</p>
+                            <p className="text-xs">Products loaded: {products.length}</p>
+                            <p className="text-xs">API Base URL: {API_BASE_URL}</p>
                         </div>
 
                         <ProductGrid products={filteredProducts} />
