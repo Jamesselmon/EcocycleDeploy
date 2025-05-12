@@ -34,8 +34,9 @@ urlpatterns = [
     path('api/admin/orders/', admin_orders_list),  #ดึงรายการคำสั่งซื้อทั้งหมด
     path('api/admin/users/', admin_users_list),  #ดึงรายการผู้ใช้งานทั้งหมด
 ]
+# Always add this for media files - even in production
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # เส้นทางสำหรับเสิร์ฟไฟล์ media ในโหมด DEBUG
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-

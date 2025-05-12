@@ -27,6 +27,16 @@ class Product(models.Model):
     objects = ProductManager()
     def __str__(self):
         return self.name
+    
+    # Add a property to get the full URL for the image
+    @property
+    def image_url(self):
+        if self.image:
+            # This will return the full path including MEDIA_URL
+            return self.image.url
+        return None
+
+
 
 # Payment: เก็บข้อมูลการชำระเงิน เช่น วิธีบัตร ชื่อผู้ถือบัตร วันหมดอายุ
 # เชื่อมโยงกับ User ที่เป็นเจ้าของการชำระเงิน

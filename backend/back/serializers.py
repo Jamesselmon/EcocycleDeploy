@@ -17,6 +17,7 @@ class ProductSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'description', 'price', 'stock', 'category', 'image']
 
 
+
 # Serializer สำหรับรายการสินค้าในแต่ละออเดอร์
 class ProductOrderSerializer(serializers.ModelSerializer):
     # ดึงชื่อสินค้าจาก ForeignKey product

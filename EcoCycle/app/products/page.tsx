@@ -10,17 +10,22 @@ type Product = {
     id: number;
     name: string;
     price: number;
-    image_url?: string;
+    image?: string;
     category: string;
 };
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
-// --- Update ProductCard ---
-const ProductCard = ({ id, name, price, image_url, category }: Product) => {
+// Updated ProductCard for local images in public directory
+const ProductCard = ({ id, name, price, image, category }: Product) => {
     const router = useRouter();
-    // Construct the full image URL correctly
-    // const imageUrl = image_url ? `${API_BASE_URL}${image_url}` : '/placeholder.png'; // Use placeholder if no image
+    
+    // Use the image path directly or fallback to placeholder
+    // No need to prepend API_BASE_URL since images are in the public directory
+    const imagePath = image || '/images/placeholder.svg';
+    
+    // Log for debugging
+    console.log(`Product ${id} - ${name}: Using image path: ${imagePath}`);
 
     return (
         <div
@@ -28,20 +33,17 @@ const ProductCard = ({ id, name, price, image_url, category }: Product) => {
             onClick={() => router.push(`/products/${id}`)}
         >
             <div className="h-48 flex justify-center items-center border-b mb-4 overflow-hidden">
-                {/* {image_url ? ( // Check if image path exists before trying to render
-                    <img
-                        src={imageUrl} // Use the constructed URL
-                        alt={name || 'Product Image'}
-                        className="object-cover h-full w-full"
-                        onError={(e) => {
-                          // Optional: Handle image loading errors, e.g., show placeholder
-                          e.currentTarget.src = '/placeholder.png';
-                        }}
-                    />
-                ) : (
-                    <span className="text-gray-400">No Image Available</span>
-                )} */}
-                <Image src={image_url || '/images/placeholder.svg'} alt={'Image'} ></Image>
+                {/* Now we can use Next.js Image component since images are local */}
+                <Image 
+                    src={imagePath}
+                    alt={name || 'Product Image'}
+                    width={500}
+                    height={300}
+                    className="object-cover h-full w-full"
+                    onError={() => {
+                        console.error(`Failed to load image: ${imagePath}`);
+                    }}
+                />
             </div>
             <h2 className="text-lg font-semibold text-emerald-700">{name}</h2>
             <p className="text-emerald-700 font-bold">฿{`${parseFloat(price.toString()).toFixed(2)}`}</p>
@@ -49,7 +51,6 @@ const ProductCard = ({ id, name, price, image_url, category }: Product) => {
         </div>
     );
 };
-
 
 const ProductGrid = ({ products }: { products: Product[] }) => (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
@@ -62,52 +63,56 @@ const ProductGrid = ({ products }: { products: Product[] }) => (
 const ProductPage = () => {
     const [products, setProducts] = useState<Product[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
-    const [loading, setLoading] = useState(true); // Add loading state
-    const [error, setError] = useState<string | null>(null); // Add error state
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         if (!API_BASE_URL) {
-            console.error("API Base URL is not defined. Check NEXT_PUBLIC_API_BASE_URL environment variable.");
+            console.error("API Base URL is not defined. Check NEXT_PUBLIC_API_URL environment variable.");
             setError("Configuration error: API URL missing.");
             setLoading(false);
             return;
         }
 
-        const apiUrl = `${API_BASE_URL}/products/`; // Construct the full API URL
-        console.log(`Fetching products from: ${apiUrl}`); // Log the URL being fetched
+        const apiUrl = `${API_BASE_URL}/products/`;
+        console.log(`Fetching products from: ${apiUrl}`);
 
-        fetch(apiUrl) // Use the constructed URL
+        fetch(apiUrl)
             .then(res => {
                 if (!res.ok) {
-                    // Throw an error if response status is not 2xx
                     throw new Error(`HTTP error! status: ${res.status}`);
                 }
                 return res.json();
             })
             .then(data => {
                 if (!Array.isArray(data)) {
-                  // Handle case where API doesn't return an array
-                  console.error('API did not return an array:', data);
-                  throw new Error('Invalid data format received from API.');
+                    console.error('API did not return an array:', data);
+                    throw new Error('Invalid data format received from API.');
                 }
+                
+                // Debug information
+                console.log("Products received from API:", data.length);
+                data.forEach((product, index) => {
+                    console.log(`Product ${index+1}: ID=${product.id}, Name=${product.name}`);
+                    console.log(`  Image path: ${product.image}`);
+                });
+                
                 setProducts(data);
                 setLoading(false);
             })
             .catch(err => {
                 console.error('Failed to load products:', err);
-                setError(`Failed to load products: ${err.message}`); // Set user-friendly error
+                setError(`Failed to load products: ${err.message}`);
                 setLoading(false);
             });
-    }, []); // Empty dependency array means this runs once on mount
+    }, []);
 
     const filteredProducts = products.filter(product =>
         product.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    // --- Add Loading and Error Display ---
     if (loading) {
        return (
-         // Basic loading indicator
          <div className="flex flex-col min-h-screen bg-gray-100 font-[Playfair Display]">
              <Header />
              <main className="flex-grow flex items-center justify-center">
@@ -120,7 +125,6 @@ const ProductPage = () => {
 
     if (error) {
       return (
-        // Basic error display
         <div className="flex flex-col min-h-screen bg-gray-100 font-[Playfair Display]">
             <Header />
             <main className="flex-grow flex items-center justify-center">
@@ -130,10 +134,7 @@ const ProductPage = () => {
         </div>
       );
     }
-    // --- End Loading/Error Display ---
 
-
-    // --- Original Return ---
     return (
         <>
             <Head>
@@ -144,7 +145,6 @@ const ProductPage = () => {
                 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet" />
             </Head>
 
-            {/* ... Head component ... */}
             <div className="flex flex-col min-h-screen bg-gray-100 font-[Playfair Display]">
             <Header />
                 <main className="flex-grow">
@@ -164,7 +164,6 @@ const ProductPage = () => {
                             </button>
                         </div>
 
-                        {/* ... Search input ... */}
                         <ProductGrid products={filteredProducts} />
                     </section>
                 </main>

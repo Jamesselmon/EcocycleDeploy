@@ -76,6 +76,7 @@ def login_view(request):
 
 
 #ดึงรายการสินค้า
+# Product list view for local images in Next.js public directory
 @api_view(['GET'])
 def product_list(request):
     products = Product.objects.all()
@@ -85,11 +86,19 @@ def product_list(request):
             'name': product.name,
             'category': product.category,
             'price': str(product.price),
-            'image': product.image.url if product.image else None,
+            # Just pass the image path as is - it will be used directly in the frontend
+            'image': product.image,
         }
         for product in products
     ]
+    
+    # Debug information
+    for product in products_data:
+        print(f"Product ID: {product['id']}, Name: {product['name']}")
+        print(f"Image path: {product['image']}")
+    
     return Response(products_data)
+
 
 #ดึงรายละเอียดสินค้าตาม id
 @api_view(['GET'])
@@ -187,11 +196,13 @@ def add_to_cart(request):
     return JsonResponse({'error': 'Invalid method'}, status=405)
 
 #ดึงรายการสินค้าในตะกร้าของผู้ใช้ตาม user_id
+# Cart items view for local images
 @api_view(['GET'])
 def get_cart_items(request, user_id):
     try:
         user = User.objects.get(id=user_id)
         cart_items = CartItem.objects.filter(user=user)
+        
         data = [
             {
                 "id": str(item.id),
@@ -201,7 +212,7 @@ def get_cart_items(request, user_id):
                 "price": float(item.product.price),
                 "quantity": item.quantity,
                 "available": item.product.stock,
-                "imageUrl": item.product.image.url if item.product.image else ""
+                "imageUrl": item.product.image  # Just use the path directly
             }
             for item in cart_items
         ]

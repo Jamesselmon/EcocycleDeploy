@@ -1,29 +1,10 @@
-// import type { NextConfig } from "next";
-
-// const nextConfig: NextConfig = {
-//   /* config options here */
-// };
-
-// export default nextConfig;
-
-// const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+// next.config.js for local images
+/** @type {import('next').NextConfig} */
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://ecocycle-backend-xoli.onrender.com';
-
 
 const nextConfig = {
   output: 'standalone',
-  images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'placehold.co',
-        port: '',
-        pathname: '/**',
-      },
-    ],
-    dangerouslyAllowSVG: true,
-    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
-  },
+  // No need for complex image configuration since images are local
   env: {
     NEXT_PUBLIC_API_URL: API_URL,
   },
