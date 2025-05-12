@@ -41,7 +41,7 @@ const ProductCard = ({ id, name, price, image_url, category }: Product) => {
                 ) : (
                     <span className="text-gray-400">No Image Available</span>
                 )} */}
-                <Image src={image_url || '/images/placeholder.svg'} alt={'Image'} ></Image>
+                <Image src={image_url || 'images/placeholder.svg'} alt={'Image'} ></Image>
             </div>
             <h2 className="text-lg font-semibold text-emerald-700">{name}</h2>
             <p className="text-emerald-700 font-bold">฿{`${parseFloat(price.toString()).toFixed(2)}`}</p>
