@@ -134,11 +134,34 @@ const ProductPage = () => {
     // --- Original Return ---
     return (
         <>
+            <Head>
+                <title>EcoCycle - Products</title>
+                <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                <link rel="preconnect" href="https://fonts.googleapis.com" />
+                <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+                <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet" />
+            </Head>
+
             {/* ... Head component ... */}
             <div className="flex flex-col min-h-screen bg-gray-100 font-[Playfair Display]">
             <Header />
                 <main className="flex-grow">
                     <section className="container mx-auto py-10">
+                        <div className="mb-10 flex justify-center items-center gap-3">
+                            <input
+                                type="text"
+                                placeholder="Search eco-friendly products..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="w-full sm:w-[350px] px-5 py-3 rounded-2xl bg-white shadow-md border border-gray-200 text-gray-700 placeholder-gray-400 text-base focus:outline-none focus:ring-2 focus:ring-emerald-400 transition-all duration-300"
+                            />
+                            <button
+                                className="px-6 py-3 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-semibold shadow-lg transition-transform duration-200 active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-emerald-500"
+                            >
+                                Search
+                            </button>
+                        </div>
+
                         {/* ... Search input ... */}
                         <ProductGrid products={filteredProducts} />
                     </section>
