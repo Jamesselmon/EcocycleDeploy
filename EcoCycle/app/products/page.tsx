@@ -4,22 +4,23 @@ import { useRouter } from 'next/navigation';
 import Footer from '@/components/Footer';
 import Header from '@/components/Header';
 import Head from 'next/head';
+import Image from 'next/image';
 
 type Product = {
     id: number;
     name: string;
     price: number;
-    image?: string;
+    image_url?: string;
     category: string;
 };
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 // --- Update ProductCard ---
-const ProductCard = ({ id, name, price, image, category }: Product) => {
+const ProductCard = ({ id, name, price, image_url, category }: Product) => {
     const router = useRouter();
     // Construct the full image URL correctly
-    const imageUrl = image ? `${API_BASE_URL}${image}` : '/placeholder.png'; // Use placeholder if no image
+    // const imageUrl = image_url ? `${API_BASE_URL}${image_url}` : '/placeholder.png'; // Use placeholder if no image
 
     return (
         <div
@@ -27,7 +28,7 @@ const ProductCard = ({ id, name, price, image, category }: Product) => {
             onClick={() => router.push(`/products/${id}`)}
         >
             <div className="h-48 flex justify-center items-center border-b mb-4 overflow-hidden">
-                {image ? ( // Check if image path exists before trying to render
+                {/* {image_url ? ( // Check if image path exists before trying to render
                     <img
                         src={imageUrl} // Use the constructed URL
                         alt={name || 'Product Image'}
@@ -39,7 +40,8 @@ const ProductCard = ({ id, name, price, image, category }: Product) => {
                     />
                 ) : (
                     <span className="text-gray-400">No Image Available</span>
-                )}
+                )} */}
+                <Image src={image_url || '/images/placeholder.png'} alt={'Image'} ></Image>
             </div>
             <h2 className="text-lg font-semibold text-emerald-700">{name}</h2>
             <p className="text-emerald-700 font-bold">฿{`${parseFloat(price.toString()).toFixed(2)}`}</p>
