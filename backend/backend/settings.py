@@ -1,6 +1,8 @@
 from pathlib import Path
 import os
 from dotenv import load_dotenv
+import dj_database_url
+
 
 # Load environment variables from .env file
 load_dotenv()
@@ -69,16 +71,27 @@ CORS_ALLOWED_ORIGINS = [
     "https://ecocycle-frontend.onrender.com",
 ]
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('DB_NAME', 'ecocycle_db'),
-        'USER': os.environ.get('DB_USER', 'postgres'),
-        'PASSWORD': os.environ.get('DB_PASSWORD', 'postgres'),
-        'HOST': os.environ.get('DB_HOST', 'db'),
-        'PORT': os.environ.get('DB_PORT', '5432'),
+DATABASE_URL_FROM_ENV = os.getenv('DATABASE_URL')
+
+if DATABASE_URL_FROM_ENV:
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=DATABASE_URL_FROM_ENV,
+            conn_max_age=600, # Optional: connection pooling
+            ssl_require=os.getenv('POSTGRES_SSLMODE', 'allow') == 'require' # Optional: สำหรับ SSL
+        )
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.getenv('POSTGRES_NAME', 'pcfavorites_db'),
+            'USER': os.getenv('POSTGRES_USER', 'postgres'),
+            'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'postgres'),
+            'HOST': os.getenv('POSTGRES_HOST', 'localhost'),
+            'PORT': os.getenv('POSTGRES_PORT', '5432'),
+        }
+    }
 
 AUTH_PASSWORD_VALIDATORS = [
     {
