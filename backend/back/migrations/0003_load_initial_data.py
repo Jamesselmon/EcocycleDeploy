@@ -12,8 +12,22 @@ from decimal import Decimal # For Product.price
 def parse_datetime_with_tz(dt_str):
     if dt_str is None:
         return None
-    # Example: '2025-05-10 11:39:51.727797+00'
-    # datetime.fromisoformat correctly handles the '+00' making it timezone-aware
+    
+    # Fix the timezone format if it's missing the colon
+    if '+' in dt_str or '-' in dt_str:
+        # Find the position of the timezone sign
+        sign_pos = max(dt_str.rfind('+'), dt_str.rfind('-'))
+        if sign_pos != -1:
+            # Check if there's a colon in the timezone part
+            tz_part = dt_str[sign_pos:]
+            if len(tz_part) == 3:  # Format like '+00' without colon
+                # Add the missing ':00'
+                dt_str = dt_str[:sign_pos+3] + ':00' + dt_str[sign_pos+3:]
+            elif len(tz_part) == 5 and ':' not in tz_part:  # Format like '+0000' without colon
+                # Insert a colon between hours and minutes
+                dt_str = dt_str[:sign_pos+3] + ':' + dt_str[sign_pos+3:]
+    
+    # Parse with the fixed format
     dt_obj = datetime.fromisoformat(dt_str)
     return dt_obj
 
