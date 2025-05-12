@@ -8,28 +8,35 @@ from datetime import datetime
 # from django.utils import timezone # No longer strictly needed if using fromisoformat directly for aware datetimes
 from decimal import Decimal # For Product.price
 from django.utils import timezone
+import re
 
 
 def parse_datetime_with_tz(dt_str):
     if dt_str is None:
         return None
-    
-    # Handle timezone format issues
-    # For +00:00 format
-    if dt_str.endswith('+00:00'):
-        # Remove the redundant :00 to make it compatible
-        dt_str = dt_str[:-5] + '+00'
-    
-    # For +00 format, add the missing :00
-    elif dt_str.endswith('+00'):
+
+    # REMOVE or COMMENT OUT this faulty block:
+    # if dt_str.endswith('+00:00'):
+    #    # Remove the redundant :00 to make it compatible  <--- THIS IS WRONG
+    #    dt_str = dt_str[:-5] + '+00'
+
+    # Keep this block if you might have data ending ONLY in '+00' (without ':00')
+    # Note: Your current data doesn't seem to have this specific format.
+    # A more robust way to handle any '+HH' or '-HH' offset without minutes:
+    match = re.search(r'([+-]\d{2})$', dt_str)
+    if match:
         dt_str = dt_str + ':00'
-        
+
     try:
+        # datetime.fromisoformat handles standard formats like '...Z' or '...+HH:MM' correctly
         return datetime.fromisoformat(dt_str)
     except ValueError:
         # Fallback to timezone.now() to prevent NULL values
-        print(f"Failed to parse datetime '{dt_str}', using current time instead")
+        # Consider if you want to raise an error during development instead
+        print(f"Failed to parse datetime '{dt_str}' after potential correction. Using current time instead.")
         return timezone.now()
+        # raise ValueError(f"Could not parse datetime string: {dt_str}") # Alternative: Fail loudly
+
 
 def load_initial_data(apps, schema_editor):
     # We get the model from the versioned app registry;
@@ -85,7 +92,7 @@ def load_initial_data(apps, schema_editor):
         user_instance = created_users.get(user_id_for_token)
         if user_instance:
             Token.objects.update_or_create(user=user_instance, defaults=token_data)
-            
+
     # --- Load Payments ---
     payments_data = [
         {'id': 2, 'method': 'paypal', 'card_no': '', 'expired': '', 'holder_name': '', 'payment_date': parse_datetime_with_tz('2025-05-10 06:41:22.455547+00'), 'payment_owner_id': 3},
