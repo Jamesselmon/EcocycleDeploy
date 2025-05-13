@@ -148,7 +148,7 @@ const OrdersPage = () => {
   
   // View order details
   const viewOrderDetails = (orderId: string) => {
-    router.push(`/orders/${orderId}`);
+    router.push(`account/orders/${orderId}`);
   };
   
   // Handle logout
