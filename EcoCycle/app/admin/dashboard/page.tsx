@@ -187,7 +187,7 @@ const AdminDashboardPage = () => {
           <button
             onClick={() => {
               localStorage.clear();
-              router.push('/account/login');
+              router.push('/');
             }}
             className="absolute top-4 right-4 px-4 py-2 bg-red-500  text-white rounded-md hover:bg-red-300 transition"
           >

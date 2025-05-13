@@ -132,14 +132,14 @@ const ProductPage = () => {
                 <div className="p-4 bg-white rounded-lg shadow-md">
                     <p className="text-red-600 mb-4">Error: {error}</p>
                     
-                    {/* Debug info */}
+                    {/* Debug info
                     <div className="mt-4 p-3 bg-gray-100 rounded text-xs overflow-auto">
                         <p className="font-bold">API URL:</p>
                         <p>{API_BASE_URL}/products/</p>
                         
                         <p className="font-bold mt-2">API Response:</p>
                         <pre>{JSON.stringify(apiResponse, null, 2)}</pre>
-                    </div>
+                    </div> */}
                 </div>
             </main>
             <Footer />
