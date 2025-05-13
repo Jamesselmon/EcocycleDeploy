@@ -6,17 +6,20 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
 
+// Define the item interface
+interface OrderItem {
+  id: string;
+  name: string;
+  quantity: number;
+  price: number;
+  imageUrl: string;
+}
+
 interface OrderSummary {
   customer_email: string;
   orderId: string;
   orderDate: string;
-  items: {
-    id: string;
-    name: string;
-    quantity: number;
-    price: number;
-    imageUrl: string;
-  }[];
+  items: OrderItem[]; // Using the OrderItem interface here
   shipping: {
     name: string;
     address: string;
@@ -69,9 +72,10 @@ const OrderContent = () => {
         // Process the items to ensure image URLs are correct
         if (data.items && data.items.length > 0) {
           // Apply the same image handling approach that worked for checkout
+          // Add explicit type annotation to the map function
           const processedData = {
             ...data,
-            items: data.items.map(item => ({
+            items: data.items.map((item: any) => ({
               ...item,
               // Use the image URL directly - just like in the checkout page
               imageUrl: item.imageUrl || '/images/placeholder.svg'
