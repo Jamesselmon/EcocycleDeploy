@@ -19,7 +19,7 @@ type Product = {
 };
 
 // Get the base URL from environment variables
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL; // Changed variable name for clarity
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL; // Changed variable name for clarity
 
 const ProductDetailPage = () => {
   const params = useParams(); // Hook to get route parameters
