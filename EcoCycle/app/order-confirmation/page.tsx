@@ -57,29 +57,42 @@ const OrderContent = () => {
 
     // Use the backend URL from environment in production
     const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://ecocycle-backend-xoli.onrender.com';
+    const requestUrl = `${apiBaseUrl}/order/${orderId}/confirmation/`;
     
-    fetch(`${apiBaseUrl}/order/${orderId}/confirmation/`)
+    console.log('Fetching order confirmation from:', requestUrl);
+    
+    fetch(requestUrl)
       .then(res => {
         if (!res.ok) {
+          console.error('Error status:', res.status);
           throw new Error(`Failed to load order: ${res.status}`);
         }
         return res.json();
       })
       .then(data => {
-        // Add debug logging
-        console.log("Order confirmation data received:", data);
+        // Log the raw response
+        console.log("Raw order confirmation data:", data);
         
-        // Process the items to ensure image URLs are correct
+        // *** SIMPLIFIED IMAGE HANDLING - Similar to checkout page approach ***
         if (data.items && data.items.length > 0) {
-          // Apply the same image handling approach that worked for checkout
-          // Add explicit type annotation to the map function
+          // Log each item's original image URL
+          data.items.forEach((item: any, index: number) => {
+            console.log(`Item ${index + 1} (${item.name}): Original imageUrl = "${item.imageUrl}"`);
+          });
+          
+          // Process items without modifying image URLs - just use them directly
           const processedData = {
             ...data,
-            items: data.items.map((item: any) => ({
-              ...item,
-              // Use the image URL directly - just like in the checkout page
-              imageUrl: item.imageUrl || '/images/placeholder.svg'
-            }))
+            items: data.items.map((item: any) => {
+              // Use the original URL or fallback to placeholder
+              let imgUrl = item.imageUrl || '/images/placeholder.svg';
+              console.log(`Using image URL for ${item.name}: ${imgUrl}`);
+              
+              return {
+                ...item,
+                imageUrl: imgUrl
+              };
+            })
           };
           
           setOrderDetails(processedData);
@@ -156,9 +169,9 @@ const OrderContent = () => {
                 {orderDetails.items.map(item => (
                   <div key={item.id} className="flex items-start">
                     <div className="flex-shrink-0 h-16 w-16 bg-gray-100 rounded-md overflow-hidden mr-4">
-                      {/* Using the same image approach as in checkout page */}
+                      {/* *** SIMPLIFIED IMAGE DISPLAY - Similar to checkout page approach *** */}
                       <img
-                        src={item.imageUrl || '/images/placeholder.svg'}
+                        src={item.imageUrl}
                         alt={item.name}
                         className="h-full w-full object-cover"
                         onError={(e) => {

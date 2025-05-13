@@ -5,13 +5,12 @@ import Head from 'next/head';
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import AuthCheck from '@/utils/authCheck';
 
-// Order type definition
+// Order interface that matches your Django API response format
 interface Order {
   id: string;
   date: string;
-  status: 'processing' | 'shipped' | 'delivered' | 'cancelled' | 'pending';
+  status: string;
   total: number;
   items: number;
   trackingNumber?: string;
@@ -23,14 +22,20 @@ const OrdersPage = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [authError, setAuthError] = useState<string | null>(null);
+  const [debugInfo, setDebugInfo] = useState<string>('');
   
   useEffect(() => {
     const fetchOrders = async () => {
       setIsLoading(true);
+      let debugLog = "Debug info:\n";
+      
       try {
-        // Get token and check if it exists
+        // Get token and userId from localStorage
         const token = localStorage.getItem('token');
-        console.log('Token found in localStorage:', token ? 'Yes' : 'No');
+        const userId = localStorage.getItem('userId');
+        
+        debugLog += `Token found: ${token ? 'Yes' : 'No'}\n`;
+        debugLog += `UserId found: ${userId ? 'Yes' : 'No'}\n`;
         
         if (!token) {
           console.error("No token found in localStorage");
@@ -39,27 +44,35 @@ const OrdersPage = () => {
           return;
         }
 
-        // Use the correct API URL
+        // Use the correct API URL from your environment and urls.py
         const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://ecocycle-backend-xoli.onrender.com';
-        const requestUrl = `${baseUrl}/account/orders/`;
         
-        console.log('Fetching orders from:', requestUrl);
-        console.log('Using token starting with:', token.substring(0, 10) + '...');
+        // Based on your urls.py, the endpoint is just '/orders/'
+        const requestUrl = `${baseUrl}/orders/`;
         
-        // Make the request with proper error handling
+        debugLog += `Fetching orders from: ${requestUrl}\n`;
+        
+        // Make the request with the token in the Authorization header
         const res = await fetch(requestUrl, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Token ${token}`
+            'Authorization': `Token ${token}`  // Django REST typically uses Token auth
           },
         });
 
-        console.log('Response status:', res.status);
+        debugLog += `Response status: ${res.status}\n`;
         
-        // Get the response text first so we can log it
+        // Handle authentication errors
+        if (res.status === 401 || res.status === 403) {
+          setAuthError("Your session has expired. Please log in again.");
+          setIsLoading(false);
+          return;
+        }
+        
+        // Get the response text for debugging
         const responseText = await res.text();
-        console.log('Raw response:', responseText);
+        debugLog += `Raw response (truncated): ${responseText.substring(0, 200)}...\n`;
 
         // Check for empty response
         if (!responseText) {
@@ -67,66 +80,53 @@ const OrdersPage = () => {
           throw new Error('Empty response from server');
         }
 
-        // Try to parse as JSON
+        // Parse JSON response
         let data;
         try {
           data = JSON.parse(responseText);
-          console.log('Parsed response data:', data);
+          debugLog += `Successfully parsed JSON response\n`;
         } catch (parseError) {
-          console.error('Error parsing response as JSON:', parseError);
-          throw new Error(`Failed to parse response as JSON: ${responseText.substring(0, 100)}...`);
+          debugLog += `Error parsing response as JSON: ${parseError}\n`;
+          throw new Error('Failed to parse response as JSON');
         }
 
-        // Handle error status codes
-        if (!res.ok) {
-          if (res.status === 401) {
-            setAuthError("Your session has expired. Please log in again.");
-            throw new Error('Authentication failed');
-          } else {
-            throw new Error(`API request failed: ${res.status} ${res.statusText}. Details: ${JSON.stringify(data)}`);
-          }
-        }
-
-        // Try different response formats
+        // Get orders from the response based on your API structure
         let ordersArray: Order[] = [];
         
         if (data.orders && Array.isArray(data.orders)) {
-          console.log('Found orders array in data.orders with length:', data.orders.length);
+          // This matches your Django API which returns {"orders": results}
+          debugLog += `Found orders array in data.orders with ${data.orders.length} orders\n`;
           ordersArray = data.orders;
         } else if (Array.isArray(data)) {
-          console.log('Response is an array directly, using it as orders with length:', data.length);
+          // Fallback if the response is a direct array
+          debugLog += `Response is a direct array with ${data.length} orders\n`;
           ordersArray = data;
         } else {
-          console.error('Could not find orders array in response:', data);
-          
-          // As a fallback, create a test order to show
-          console.log('Creating a test order for debugging purposes');
-          ordersArray = [
-            {
-              id: '12345',
-              date: new Date().toLocaleDateString(),
-              status: 'pending',
-              total: 199.99,
-              items: 3
-            }
-          ];
+          debugLog += `Could not find orders array in response\n`;
+          debugLog += `Response keys: ${Object.keys(data).join(', ')}\n`;
         }
         
         setOrders(ordersArray);
+        debugLog += `Final orders count: ${ordersArray.length}\n`;
       } catch (error) {
         console.error('Error fetching orders:', error);
+        debugLog += `Error: ${error}\n`;
+        
+        if (!authError) {
+          setAuthError("Could not load your orders. Please try again later.");
+        }
       } finally {
         setIsLoading(false);
+        setDebugInfo(debugLog);
       }
     };
   
     fetchOrders();
   }, []);
   
-  
   // Function to get status badge color based on order status
-  const getStatusBadgeColor = (status: Order['status']) => {
-    switch (status) {
+  const getStatusBadgeColor = (status: string) => {
+    switch (status.toLowerCase()) {
       case 'processing':
         return 'bg-blue-100 text-blue-800';
       case 'shipped':
@@ -158,6 +158,14 @@ const OrdersPage = () => {
     localStorage.removeItem('userId');
     router.push('/login');
   };
+
+  // Show/hide debug info
+  const toggleDebugInfo = () => {
+    const debugElement = document.getElementById('debug-info');
+    if (debugElement) {
+      debugElement.style.display = debugElement.style.display === 'none' ? 'block' : 'none';
+    }
+  };
   
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
@@ -184,7 +192,18 @@ const OrdersPage = () => {
                   Log In Again
                 </button>
               )}
+              <button
+                onClick={toggleDebugInfo}
+                className="inline-flex items-center justify-center px-5 py-2 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 transition-colors duration-200"
+              >
+                Debug
+              </button>
             </div>
+          </div>
+          
+          {/* Debug Information (hidden by default) */}
+          <div id="debug-info" className="bg-gray-100 p-4 rounded-lg mb-6 text-xs font-mono overflow-auto" style={{ display: 'none', maxHeight: '200px' }}>
+            <pre>{debugInfo}</pre>
           </div>
           
           {authError ? (
