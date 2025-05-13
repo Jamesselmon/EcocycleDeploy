@@ -4,7 +4,6 @@ import { useRouter } from 'next/navigation';
 import Footer from '@/components/Footer';
 import Header from '@/components/Header';
 import Head from 'next/head';
-import Image from 'next/image';
 
 type Product = {
     id: number;
