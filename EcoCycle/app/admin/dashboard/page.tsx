@@ -346,18 +346,18 @@ const AdminDashboardPage = () => {
                         .filter(product => product.inventory < 20 && product.status === 'active')
                         .slice(0, 3)
                         .map(product => (
-                          <div key={product.id} className="flex justify-between items-center border-b border-gray-100 pb-3">
-                            <div>
-                              <p className="font-medium text-gray-800">{product.name}</p>
+                          <div key={product.id} className="flex justify-between items-start border-b border-gray-100 pb-3">
+                            <div className="max-w-[60%]">
+                              <p className="font-medium text-gray-800 break-words">{product.name}</p>
                               <p className="text-sm text-gray-500">{product.category}</p>
                             </div>
-                            <div className="flex items-center">
+                            <div className="flex flex-col items-end">
                               <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
                                 ${product.inventory === 0 ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'}`
                               }>
                                 {product.inventory === 0 ? 'Out of Stock' : `${product.inventory} left`}
                               </span>
-                              <span className="ml-4 font-medium text-gray-800">{formatCurrency(product.price)}</span>
+                              <span className="mt-2 font-medium text-gray-500">{formatCurrency(product.price)}</span>
                             </div>
                           </div>
                         ))}
@@ -473,7 +473,7 @@ const AdminDashboardPage = () => {
                             <div className="text-sm text-gray-900">{order.customer}</div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm text-gray-900">{formatCurrency(order.total)}</div>
+                            <div className="text-sm text-gray-500">{formatCurrency(order.total)}</div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
