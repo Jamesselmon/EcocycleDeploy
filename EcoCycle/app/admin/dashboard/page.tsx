@@ -323,7 +323,7 @@ const AdminDashboardPage = () => {
                             }>
                               {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                             </span>
-                            <span className="ml-4 font-medium">{formatCurrency(order.total)}</span>
+                            <span className="ml-4 font-medium text-gray-800">{formatCurrency(order.total)}</span>
                           </div>
                         </div>
                       ))}
@@ -357,7 +357,7 @@ const AdminDashboardPage = () => {
                               }>
                                 {product.inventory === 0 ? 'Out of Stock' : `${product.inventory} left`}
                               </span>
-                              <span className="ml-4 font-medium">{formatCurrency(product.price)}</span>
+                              <span className="ml-4 font-medium text-gray-800">{formatCurrency(product.price)}</span>
                             </div>
                           </div>
                         ))}
