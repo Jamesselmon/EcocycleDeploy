@@ -45,6 +45,43 @@ interface OrderDetails {
 
 const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://ecocycle-backend-xoli.onrender.com';
 
+// Helper function to fix image URLs - added from order confirmation page
+const fixImageUrl = (url: string | undefined): string => {
+  if (!url) return '/images/placeholder.svg';
+  
+  // If it's an absolute URL with http/https, use it directly
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url;
+  }
+  
+  // If it's already in the /images/ format, use it directly
+  if (url.startsWith('/images/')) {
+    return url;
+  }
+  
+  // If it's a media URL from Django, convert to images directory
+  if (url.startsWith('/media/')) {
+    // Extract the filename from the path
+    const parts = url.split('/');
+    const filename = parts[parts.length - 1];
+    return `/images/${filename}`;
+  }
+  
+  // For other relative paths, add /images/ prefix if they have an image extension
+  const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.svg', '.webp'];
+  for (const ext of imageExtensions) {
+    if (url.toLowerCase().endsWith(ext)) {
+      // If it's just a filename without a path, add /images/ prefix
+      if (!url.includes('/')) {
+        return `/images/${url}`;
+      }
+    }
+  }
+  
+  // If all else fails, try using the URL directly
+  return url;
+};
+
 const OrderDetailsPage = () => {
   const router = useRouter();
   const params = useParams();
@@ -52,6 +89,7 @@ const OrderDetailsPage = () => {
 
   const [orderDetails, setOrderDetails] = useState<OrderDetails | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [debugUrls, setDebugUrls] = useState<{original: string, fixed: string}[]>([]);
 
   useEffect(() => {
     const fetchOrderDetails = async () => {
@@ -75,18 +113,33 @@ const OrderDetailsPage = () => {
         if (!res.ok) throw new Error('Failed to fetch order details');
 
         const data = await res.json();
+        const urlDebugInfo: {original: string, fixed: string}[] = [];
 
+        // Map and fix the image URLs
         const mappedData: OrderDetails = {
           id: data.orderId,
           date: data.orderDate,
           status: data.status, 
-          items: data.items.map((item: any) => ({
-            id: item.id,
-            name: item.name,
-            quantity: item.quantity,
-            price: item.price,
-            imageUrl: item.imageUrl,
-          })),
+          items: data.items.map((item: any) => {
+            // Original imageUrl from the API
+            const originalUrl = item.imageUrl || '';
+            console.log(`Original image URL for ${item.name}: ${originalUrl}`);
+            
+            // Apply our image URL fixing function
+            const fixedUrl = fixImageUrl(originalUrl);
+            console.log(`Fixed image URL for ${item.name}: ${fixedUrl}`);
+            
+            // Store for debugging
+            urlDebugInfo.push({original: originalUrl, fixed: fixedUrl});
+            
+            return {
+              id: item.id,
+              name: item.name,
+              quantity: item.quantity,
+              price: item.price,
+              imageUrl: fixedUrl, // Use the fixed URL
+            };
+          }),
           shipping: {
             name: data.shipping.name,
             address: data.shipping.address,
@@ -103,11 +156,11 @@ const OrderDetailsPage = () => {
           shippingCost: data.shippingCost,
           tax: data.tax,
           total: data.total,
-          trackingNumber: '', 
+          trackingNumber: data.trackingNumber || '', 
           estimatedDelivery: data.estimatedDelivery,
         };
 
-
+        setDebugUrls(urlDebugInfo);
         setOrderDetails(mappedData);
       } catch (err) {
         console.error('Error fetching order details:', err);
@@ -118,6 +171,14 @@ const OrderDetailsPage = () => {
 
     fetchOrderDetails();
   }, [orderId]);
+
+  // Toggle debug info display
+  const toggleDebugInfo = () => {
+    const debugElement = document.getElementById('image-debug-info');
+    if (debugElement) {
+      debugElement.style.display = debugElement.style.display === 'none' ? 'block' : 'none';
+    }
+  };
 
   const getStatusBadgeColor = (status: OrderDetails['status']) => {
     switch (status) {
@@ -137,7 +198,6 @@ const OrderDetailsPage = () => {
   const formatCurrency = (amount: number) => {
     return `${amount.toFixed(2)} ฿` ;
   };
-
 
   return (
     <AuthCheck returnUrl={`/account/orders/${orderId}`}>
@@ -160,6 +220,37 @@ const OrderDetailsPage = () => {
                 </svg>
                 Back to Orders
               </Link>
+
+              {/* Debug button (similar to order confirmation page) */}
+              <button
+                onClick={toggleDebugInfo}
+                className="text-xs text-gray-500 underline ml-6"
+              >
+                Debug Images
+              </button>
+
+              {/* Debug Information (hidden by default) */}
+              <div id="image-debug-info" className="bg-gray-100 p-4 rounded-lg mb-6 text-xs font-mono overflow-auto" style={{ display: 'none', maxHeight: '200px' }}>
+                <h4 className="font-bold mb-2">Image URL Transformations:</h4>
+                <table className="w-full text-left">
+                  <thead>
+                    <tr>
+                      <th className="p-1 border">Item</th>
+                      <th className="p-1 border">Original URL</th>
+                      <th className="p-1 border">Fixed URL</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {debugUrls.map((item, index) => (
+                      <tr key={index}>
+                        <td className="p-1 border">{index + 1}</td>
+                        <td className="p-1 border">{item.original || 'none'}</td>
+                        <td className="p-1 border">{item.fixed}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
 
               {isLoading ? (
                 <div className="flex justify-center py-20">
@@ -198,7 +289,6 @@ const OrderDetailsPage = () => {
                               <p className="text-sm text-gray-600">{orderDetails.estimatedDelivery}</p>
                             </div>
                             <div className="mt-3 sm:mt-0">
-
                               <button
                                 className="text-sm font-medium text-emerald-600 hover:text-emerald-500"
                                 onClick={() => {
@@ -221,11 +311,15 @@ const OrderDetailsPage = () => {
                         {orderDetails.items.map(item => (
                           <div key={item.id} className="py-4 flex items-center">
                             <div className="flex-shrink-0 h-16 w-16 bg-gray-100 rounded-md overflow-hidden mr-4">
-                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              {/* Added error handling for images, similar to order confirmation page */}
                               <img
                                 src={item.imageUrl}
                                 alt={item.name}
                                 className="h-full w-full object-cover"
+                                onError={(e) => {
+                                  console.error(`Failed to load image: ${item.imageUrl}`);
+                                  e.currentTarget.src = '/images/placeholder.svg';
+                                }}
                               />
                             </div>
                             <div className="flex-1 min-w-0">
