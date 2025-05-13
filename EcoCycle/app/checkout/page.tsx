@@ -73,7 +73,7 @@ const CheckoutPage = () => {
   useEffect(() => {
     const storedUserId = localStorage.getItem('userId');
     if (!storedUserId) return;
-  
+
     fetch(`${baseUrl}/cart/${storedUserId}/`)
       .then(res => {
         if (!res.ok) throw new Error('Failed to fetch cart');
@@ -81,10 +81,15 @@ const CheckoutPage = () => {
       })
       .then(data => {
         const items = data.map((item: any) => {
-          const imgUrl = item.imageUrl?.startsWith('/')
-            ? `${baseUrl}${item.imageUrl}`
-            : item.imageUrl;
-  
+          // FIXED IMAGE URL HANDLING:
+          // For local images in the public directory, use the path directly
+          // This works for paths like /images/PD01.jpg which are in your public directory
+          // Don't prepend the baseUrl for local images
+          const imgUrl = item.imageUrl || '/images/placeholder.svg';
+          
+          // Debug the image URL
+          console.log(`Item ${item.id || item.productId}: Image URL = ${imgUrl}`);
+
           return {
             id: item.id, 
             productId: item.productId, 
@@ -99,7 +104,7 @@ const CheckoutPage = () => {
       .catch(err => {
         console.error('Cart load error:', err);
       });
-  }, []); 
+  }, []);
   
   
 
