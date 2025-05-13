@@ -39,12 +39,49 @@ interface OrderSummary {
   estimatedDelivery: string;
 }
 
+// Helper function to fix image URLs
+const fixImageUrl = (url: string | undefined): string => {
+  if (!url) return '/images/placeholder.svg';
+  
+  // If it's an absolute URL with http/https, use it directly
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url;
+  }
+  
+  // If it's already in the /images/ format, use it directly
+  if (url.startsWith('/images/')) {
+    return url;
+  }
+  
+  // If it's a media URL from Django, convert to images directory
+  if (url.startsWith('/media/')) {
+    // Extract the filename from the path
+    const parts = url.split('/');
+    const filename = parts[parts.length - 1];
+    return `/images/${filename}`;
+  }
+  
+  // For other relative paths, add /images/ prefix if they have an image extension
+  const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.svg', '.webp'];
+  for (const ext of imageExtensions) {
+    if (url.toLowerCase().endsWith(ext)) {
+      // If it's just a filename without a path, add /images/ prefix
+      if (!url.includes('/')) {
+        return `/images/${url}`;
+      }
+    }
+  }
+  
+  // If all else fails, try using the URL directly
+  return url;
+};
+
 // Component that handles the search params and content
 const OrderContent = () => {
   const [orderDetails, setOrderDetails] = useState<OrderSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [rawImageData, setRawImageData] = useState<string>('');
+  const [debugUrls, setDebugUrls] = useState<{original: string, fixed: string}[]>([]);
   
   const searchParams = useSearchParams();
   const orderId = searchParams.get("orderId");
@@ -74,34 +111,34 @@ const OrderContent = () => {
         // Log the raw response
         console.log("Raw order confirmation data:", data);
         
-        // Store image debug data
+        // Process the items to ensure image URLs are correct
         if (data.items && data.items.length > 0) {
-          const imageDebug = data.items.map((item: any, index: number) => 
-            `Item ${index}: ${item.name} - imageUrl: ${item.imageUrl || 'undefined'}`
-          ).join('\n');
-          setRawImageData(imageDebug);
-        }
-        
-        // *** EXACT SAME APPROACH AS CHECKOUT PAGE ***
-        if (data.items && data.items.length > 0) {
+          const urlDebugInfo: {original: string, fixed: string}[] = [];
+          
+          // Process the data with fixed image URLs
           const processedData = {
             ...data,
             items: data.items.map((item: any) => {
-              // Use exactly the same approach as in checkout page
-              let imgUrl = item.imageUrl || '/images/placeholder.svg';
+              // Original imageUrl from the API
+              const originalUrl = item.imageUrl || '';
+              console.log(`Original image URL for ${item.name}: ${originalUrl}`);
               
-              // Debug the image URL just like in checkout page
-              console.log(`Item ${item.id || 'unknown'}: Image path from API = ${item.imageUrl}`);
-              console.log(`Using image URL: ${imgUrl}`);
+              // Apply our image URL fixing function
+              const fixedUrl = fixImageUrl(originalUrl);
+              console.log(`Fixed image URL for ${item.name}: ${fixedUrl}`);
+              
+              // Store for debugging
+              urlDebugInfo.push({original: originalUrl, fixed: fixedUrl});
               
               return {
                 ...item,
-                imageUrl: imgUrl
+                imageUrl: fixedUrl
               };
             })
           };
           
           setOrderDetails(processedData);
+          setDebugUrls(urlDebugInfo);
         } else {
           setOrderDetails(data);
         }
@@ -115,9 +152,8 @@ const OrderContent = () => {
       });
   }, [orderId]);
 
-  // Toggle debug information
   const toggleDebugInfo = () => {
-    const debugElement = document.getElementById('debug-info');
+    const debugElement = document.getElementById('image-debug-info');
     if (debugElement) {
       debugElement.style.display = debugElement.style.display === 'none' ? 'block' : 'none';
     }
@@ -145,7 +181,7 @@ const OrderContent = () => {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-12">
-      <div className="text-center mb-10">
+      <div className="text-center mb-6">
         <div className="inline-flex items-center justify-center h-20 w-20 rounded-full bg-emerald-100 mb-4">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -156,7 +192,7 @@ const OrderContent = () => {
         <p className="text-gray-600">
           We&apos;ve sent a confirmation email to <span className="font-medium">{orderDetails.customer_email}</span>
         </p>
-        <button 
+        <button
           onClick={toggleDebugInfo}
           className="mt-2 text-xs text-gray-500 underline"
         >
@@ -165,9 +201,26 @@ const OrderContent = () => {
       </div>
 
       {/* Debug Information (hidden by default) */}
-      <div id="debug-info" className="bg-gray-100 p-4 rounded-lg mb-6 text-xs font-mono overflow-auto" style={{ display: 'none', maxHeight: '200px' }}>
-        <h4 className="font-bold mb-2">Raw Image Data from API:</h4>
-        <pre>{rawImageData}</pre>
+      <div id="image-debug-info" className="bg-gray-100 p-4 rounded-lg mb-6 text-xs font-mono overflow-auto" style={{ display: 'none', maxHeight: '200px' }}>
+        <h4 className="font-bold mb-2">Image URL Transformations:</h4>
+        <table className="w-full text-left">
+          <thead>
+            <tr>
+              <th className="p-1 border">Item</th>
+              <th className="p-1 border">Original URL</th>
+              <th className="p-1 border">Fixed URL</th>
+            </tr>
+          </thead>
+          <tbody>
+            {debugUrls.map((item, index) => (
+              <tr key={index}>
+                <td className="p-1 border">{index + 1}</td>
+                <td className="p-1 border">{item.original || 'none'}</td>
+                <td className="p-1 border">{item.fixed}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
       <div className="bg-white rounded-xl shadow-md overflow-hidden mb-8">
@@ -195,7 +248,7 @@ const OrderContent = () => {
                 {orderDetails.items.map(item => (
                   <div key={item.id} className="flex items-start">
                     <div className="flex-shrink-0 h-16 w-16 bg-gray-100 rounded-md overflow-hidden mr-4">
-                      {/* EXACT SAME IMAGE HANDLING AS CHECKOUT PAGE */}
+                      {/* Image with better error handling and logging */}
                       <img
                         src={item.imageUrl}
                         alt={item.name}
