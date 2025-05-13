@@ -2,6 +2,7 @@
 import Head from 'next/head';
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 // At the top of your file, add this debugging code
 console.log("NEXT_PUBLIC_API_URL:", process.env.NEXT_PUBLIC_API_URL);
@@ -283,7 +284,7 @@ const SignupPage = () => {
           <div className="text-center mt-6">
             <p className="text-gray-600">
               Already have an account?{' '}
-              <a href="/" className="text-emerald-600 hover:underline">Sign in</a>
+              <Link href="/" className="text-emerald-600 hover:underline">Sign in</Link>
             </p>
           </div>
         </div>
