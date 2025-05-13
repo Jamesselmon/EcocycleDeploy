@@ -175,7 +175,7 @@ const ProductDetailPage = () => {
     : parseFloat(String(product.price)).toFixed(2);
 
   // Construct image URL safely
-  const imageUrl = product.image && API_BASE_URL ? `${API_BASE_URL}${product.image}` : '@/public/images/placeholder.svg'; // Provide a fallback placeholder image path
+  const imageUrl = product.image || '/images/placeholder.svg'; // Provide a fallback placeholder image path
 
   return (
     <>
