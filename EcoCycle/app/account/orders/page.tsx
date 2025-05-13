@@ -37,7 +37,7 @@ const OrdersPage = () => {
         }
   
         console.log('Fetching orders...');
-        const res = await fetch('baseUrl/orders/', {
+        const res = await fetch('baseUrl/account/orders/', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
