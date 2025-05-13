@@ -43,6 +43,8 @@ interface OrderDetails {
   estimatedDelivery?: string;
 }
 
+const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://ecocycle-backend-xoli.onrender.com';
+
 const OrderDetailsPage = () => {
   const router = useRouter();
   const params = useParams();
@@ -62,7 +64,7 @@ const OrderDetailsPage = () => {
       }
 
       try {
-        const res = await fetch(`http://localhost:8000/order/${orderId}/confirmation/`, {
+        const res = await fetch(`baseUrl/order/${orderId}/confirmation/`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',

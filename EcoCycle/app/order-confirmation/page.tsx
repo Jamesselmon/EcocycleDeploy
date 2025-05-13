@@ -53,7 +53,7 @@ const OrderContent = () => {
     }
 
     // Use the backend URL from environment in production
-    const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000';
+    const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://ecocycle-backend-xoli.onrender.com';
     
     fetch(`${apiBaseUrl}/order/${orderId}/confirmation/`)
       .then(res => res.json())
