@@ -134,7 +134,7 @@ const ProductDetailPage = () => {
           console.log("Add to cart successful:", data);
           // alert('Item added to cart successfully!'); // Give feedback
           // Consider updating cart state locally or redirecting
-          router.push('/cart'); // Example redirect
+          router.push('/checkout'); // Example redirect
         })
         .catch(err => {
           console.error("Error adding to cart:", err);
