@@ -68,7 +68,7 @@ const CheckoutPage = () => {
   const [sameAsShipping, setSameAsShipping] = useState<boolean>(true);
   const [paymentMethod, setPaymentMethod] = useState<string>('paypal');
 
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:8000';
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://ecocycle-backend-xoli.onrender.com';
 
   useEffect(() => {
     const storedUserId = localStorage.getItem('userId');
