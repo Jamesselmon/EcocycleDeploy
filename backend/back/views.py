@@ -448,7 +448,7 @@ def admin_products_list(request):
             'category': product.category,
             'status': 'active',  # You may need to add a status field to your Product model
             'description': product.description,
-            'image': request.build_absolute_uri(product.image.url) if product.image else None,
+            'image': product.image,
         }
         for product in products
     ]
