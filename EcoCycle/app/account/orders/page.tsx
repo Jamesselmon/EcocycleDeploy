@@ -1,4 +1,4 @@
-// View All Orders Page Component
+// Fixed Orders Page Component with proper API URL
 "use client"
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -19,8 +19,6 @@ interface Order {
   deliveryEstimate?: string;
 }
 
-const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://ecocycle-backend-xoli.onrender.com';
-
 const OrdersPage = () => {
   const router = useRouter();
   const [orders, setOrders] = useState<Order[]>([]);
@@ -33,11 +31,17 @@ const OrdersPage = () => {
         const token = localStorage.getItem('token');
         if (!token) {
           console.error("No token found");
+          setIsLoading(false);
           return;
         }
   
-        console.log('Fetching orders...');
-        const res = await fetch('baseUrl/account/orders/', {
+        // Use the correct API URL
+        const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://ecocycle-backend-xoli.onrender.com';
+        
+        console.log('Fetching orders from:', `${baseUrl}/account/orders/`);
+        
+        // FIXED: Correct URL string - changed 'baseUrl' text to the actual variable
+        const res = await fetch(`${baseUrl}/account/orders/`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',

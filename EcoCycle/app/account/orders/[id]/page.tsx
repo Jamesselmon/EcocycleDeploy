@@ -64,7 +64,7 @@ const OrderDetailsPage = () => {
       }
 
       try {
-        const res = await fetch(`baseUrl/order/${orderId}/confirmation/`, {
+        const res = await fetch(`${baseUrl}/order/${orderId}/confirmation/`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
