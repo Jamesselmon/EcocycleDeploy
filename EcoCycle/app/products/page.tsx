@@ -176,12 +176,12 @@ const ProductPage = () => {
                             </button>
                         </div>
 
-                        {/* Debug info */}
+                        {/* Debug info
                         <div className="mb-4 p-3 bg-gray-100 rounded">
                             <p className="text-sm font-bold">API Response Summary:</p>
                             <p className="text-xs">Products loaded: {products.length}</p>
                             <p className="text-xs">API Base URL: {API_BASE_URL}</p>
-                        </div>
+                        </div> */}
 
                         <ProductGrid products={filteredProducts} />
                     </section>
