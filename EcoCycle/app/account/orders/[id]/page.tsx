@@ -223,7 +223,7 @@ const OrderDetailsPage = () => {
                             <div className="flex-shrink-0 h-16 w-16 bg-gray-100 rounded-md overflow-hidden mr-4">
                               {/* eslint-disable-next-line @next/next/no-img-element */}
                               <img
-                                src={item.imageUrl.startsWith('http') ? item.imageUrl : `http://localhost:8000${item.imageUrl}`}
+                                src={item.imageUrl}
                                 alt={item.name}
                                 className="h-full w-full object-cover"
                               />
