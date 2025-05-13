@@ -1,7 +1,6 @@
 "use client"
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import Head from 'next/head';
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -192,12 +191,12 @@ const OrdersPage = () => {
                   Log In Again
                 </button>
               )}
-              <button
+              {/* <button
                 onClick={toggleDebugInfo}
                 className="inline-flex items-center justify-center px-5 py-2 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 transition-colors duration-200"
               >
                 Debug
-              </button>
+              </button> */}
             </div>
           </div>
           
