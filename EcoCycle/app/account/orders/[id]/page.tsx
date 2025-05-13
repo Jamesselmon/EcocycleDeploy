@@ -221,13 +221,13 @@ const OrderDetailsPage = () => {
                 Back to Orders
               </Link>
 
-              {/* Debug button (similar to order confirmation page) */}
+              {/* Debug button (similar to order confirmation page)
               <button
                 onClick={toggleDebugInfo}
                 className="text-xs text-gray-500 underline ml-6"
               >
                 Debug Images
-              </button>
+              </button> */}
 
               {/* Debug Information (hidden by default) */}
               <div id="image-debug-info" className="bg-gray-100 p-4 rounded-lg mb-6 text-xs font-mono overflow-auto" style={{ display: 'none', maxHeight: '200px' }}>

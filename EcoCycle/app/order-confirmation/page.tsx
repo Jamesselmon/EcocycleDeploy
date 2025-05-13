@@ -192,12 +192,12 @@ const OrderContent = () => {
         <p className="text-gray-600">
           We&apos;ve sent a confirmation email to <span className="font-medium">{orderDetails.customer_email}</span>
         </p>
-        <button
+        {/* <button
           onClick={toggleDebugInfo}
           className="mt-2 text-xs text-gray-500 underline"
         >
           Debug Images
-        </button>
+        </button> */}
       </div>
 
       {/* Debug Information (hidden by default) */}
