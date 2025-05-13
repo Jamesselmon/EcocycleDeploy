@@ -56,15 +56,39 @@ const OrderContent = () => {
     const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://ecocycle-backend-xoli.onrender.com';
     
     fetch(`${apiBaseUrl}/order/${orderId}/confirmation/`)
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) {
+          throw new Error(`Failed to load order: ${res.status}`);
+        }
+        return res.json();
+      })
       .then(data => {
-        setOrderDetails(data);
+        // Add debug logging
+        console.log("Order confirmation data received:", data);
+        
+        // Process the items to ensure image URLs are correct
+        if (data.items && data.items.length > 0) {
+          // Apply the same image handling approach that worked for checkout
+          const processedData = {
+            ...data,
+            items: data.items.map(item => ({
+              ...item,
+              // Use the image URL directly - just like in the checkout page
+              imageUrl: item.imageUrl || '/images/placeholder.svg'
+            }))
+          };
+          
+          setOrderDetails(processedData);
+        } else {
+          setOrderDetails(data);
+        }
+        
         setLoading(false);
       })
       .catch(err => {
         console.error("Error loading order confirmation:", err);
         setLoading(false);
-        setError("Failed to load order details.");
+        setError(`Failed to load order details: ${err.message}`);
       });
   }, [orderId]);
 
@@ -128,11 +152,15 @@ const OrderContent = () => {
                 {orderDetails.items.map(item => (
                   <div key={item.id} className="flex items-start">
                     <div className="flex-shrink-0 h-16 w-16 bg-gray-100 rounded-md overflow-hidden mr-4">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      {/* Using the same image approach as in checkout page */}
                       <img
-                        src={`${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000'}${item.imageUrl}`}
+                        src={item.imageUrl || '/images/placeholder.svg'}
                         alt={item.name}
                         className="h-full w-full object-cover"
+                        onError={(e) => {
+                          console.error(`Failed to load image: ${item.imageUrl}`);
+                          e.currentTarget.src = '/images/placeholder.svg';
+                        }}
                       />
                     </div>
                     <div className="flex-1">
