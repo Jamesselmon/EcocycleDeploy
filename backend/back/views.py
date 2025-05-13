@@ -39,6 +39,10 @@ def login_view(request):
         if not user.check_password(password):
             return Response({"error": "Invalid credentials"}, status=status.HTTP_400_BAD_REQUEST)
 
+        # update last login after authentication successfull
+        user.last_login = timezone.now()
+        user.save(update_fields=['last_login'])
+
         #login สำเร็จ → ส่ง token
         token, created = Token.objects.get_or_create(user=user)
 

@@ -124,7 +124,7 @@ const AdminDashboardPage = () => {
       setIsLoading(false);
 
       // Optionally show an error message to the user
-      alert('Failed to load dashboard data. Please try again.');
+      alert('ed to load dashboard data. FailPlease try again.');
     }
   };
 
