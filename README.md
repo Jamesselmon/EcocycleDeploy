@@ -1,6 +1,24 @@
-**EcoCycle** is an e-commerce platform dedicated to selling recycled products.
+# EcoCycle  
+### An e-commerce platform dedicated to selling recycled products.
 
 - [Prorotype] [https://ecocycle-frontend.onrender.com/](https://ecocycle-frontend.onrender.com/)
+
+## Team Members
+
+- 6510742163 นางสาวศุภิสรา สีถาวร
+- 6510742452 นายพีรภาส งอกผล
+
+## Previews
+
+<img src="https://github.com/Jamesselmon/EcocycleDeploy/tree/main/assets/product.png" alt="EcoCycle Homepage">
+
+<img src="https://github.com/Jamesselmon/EcocycleDeploy/tree/main/assets/productdetail.png" alt="Product Detail">
+
+<img src="https://github.com/Jamesselmon/EcocycleDeploy/tree/main/assets/order.png" alt="My Order">
+
+<img src="https://github.com/Jamesselmon/EcocycleDeploy/tree/main/assets/thankyou.png" alt="Order Confirmation">
+
+<img src="https://github.com/Jamesselmon/EcocycleDeploy/tree/main/assets/admin.png" alt="Admin Dashboard">
 
 ## Features
 
@@ -17,23 +35,6 @@
 - **Backend:** [Django](https://www.djangoproject.com/)
 - **Database:** [PostgreSQL](https://www.postgresql.org/) 
 - **Deployment:** [Render](https://render.com/) 
-
-## Team Members
-
-- 6510742163 นางสาวศุภิสรา สีถาวร
-- 6510742452 นายพีรภาส งอกผล
-
-## Previews
-
-<img src="https://github.com/Jamesselmon/EcocycleDeploy/assets/product.png" alt="EcoCycle Homepage">
-
-<img src="https://github.com/Jamesselmon/EcocycleDeploy/assets/productdetail.png" alt="Product Detail">
-
-<img src="https://github.com/Jamesselmon/EcocycleDeploy/assets/order.png" alt="My Order">
-
-<img src="https://github.com/Jamesselmon/EcocycleDeploy/assets/thankyou.png" alt="Order Confirmation">
-
-<img src="https://github.com/Jamesselmon/EcocycleDeploy/assets/admin.png" alt="Admin Dashboard">
 
 ## Deployment
 
