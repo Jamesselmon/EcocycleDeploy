@@ -10,15 +10,15 @@
 
 ## Previews
 
-<img src="https://github.com/Jamesselmon/EcocycleDeploy/tree/main/assets/product.png" alt="EcoCycle Homepage">
+<img src="https://github.com/Jamesselmon/EcocycleDeploy/tree/main/assets/product.PNG" alt="EcoCycle Homepage">
 
-<img src="https://github.com/Jamesselmon/EcocycleDeploy/tree/main/assets/productdetail.png" alt="Product Detail">
+<img src="https://github.com/Jamesselmon/EcocycleDeploy/tree/main/assets/productdetail.PNG" alt="Product Detail">
 
-<img src="https://github.com/Jamesselmon/EcocycleDeploy/tree/main/assets/order.png" alt="My Order">
+<img src="https://github.com/Jamesselmon/EcocycleDeploy/tree/main/assets/order.PNG" alt="My Order">
 
-<img src="https://github.com/Jamesselmon/EcocycleDeploy/tree/main/assets/thankyou.png" alt="Order Confirmation">
+<img src="https://github.com/Jamesselmon/EcocycleDeploy/tree/main/assets/thankyou.PNG" alt="Order Confirmation">
 
-<img src="https://github.com/Jamesselmon/EcocycleDeploy/tree/main/assets/admin.png" alt="Admin Dashboard">
+<img src="https://github.com/Jamesselmon/EcocycleDeploy/tree/main/assets/admin.PNG" alt="Admin Dashboard">
 
 ## Features
 
