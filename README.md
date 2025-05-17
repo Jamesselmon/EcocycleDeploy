@@ -1,7 +1,7 @@
 # EcoCycle  
 ### An e-commerce platform dedicated to selling recycled products.
 
-- [Prorotype] [https://ecocycle-frontend.onrender.com/](https://ecocycle-frontend.onrender.com/)
+- [Prototype] [https://ecocycle-frontend.onrender.com/](https://ecocycle-frontend.onrender.com/)
 
 ## Team Members
 
@@ -41,7 +41,7 @@
 EcoCycle is deployed on Render using three separate services:
 
 1.  **Frontend (Next.js):** [https://ecocycle-frontend.onrender.com](https://ecocycle-frontend.onrender.com)
-2.  **Backend (Django):** [Link to your Render Backend Service](https://ecocycle-backend-xoli.onrender.com)
+2.  **Backend (Django):** [https://ecocycle-backend-xoli.onrender.com](https://ecocycle-backend-xoli.onrender.com)
 3.  **Database (PostgreSQL):** Hosted on Render.
 
 ## Setup Instructions (for local development)
